@@ -44,7 +44,7 @@ ImageAnalyzer.prototype.getURI = function (d, type) {
     if (type == 'thumb') {
         if (d.thumbnailURI == '' || d.thumbnailURI == null) {
             if (d.sourceURI == '' || d.sourceURI == null) {
-                var placeholder = 'http://placehold.it/' + d.width + 'x' + d.height + '&text=' + d.uid;
+                var placeholder = 'placehold.it/' + d.width + 'x' + d.height + '&text=' + d.uid;
                 return placeholder;
             }
             return d.sourceURI;
@@ -55,7 +55,7 @@ ImageAnalyzer.prototype.getURI = function (d, type) {
     }
     else {
         if (d.sourceURI == '' || d.sourceURI == null) {
-            var placeholder = 'http://placehold.it/' + d.width + 'x' + d.height + '&text=' + d.uid;
+            var placeholder = 'placehold.it/' + d.width + 'x' + d.height + '&text=' + d.uid;
             return placeholder;
         }
         else {
