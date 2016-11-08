@@ -76,7 +76,7 @@ ImageAnalyzer.prototype.update = function () {
     var renderWidth = self.selectedRender[0].naturalWidth;
     var renderHeight = self.selectedRender[0].naturalHeight;
     console.log(self.selectedRender[0].naturalHeight);
-    $('#reconst-image').attr('src', 'http://placehold.it/' + renderWidth / 3 + 'x' + renderHeight / 3 + '&text=Reconstruction+Not+Executed');
+    $('#reconst-image').attr('src', 'https://placehold.it/' + renderWidth / 3 + 'x' + renderHeight / 3 + '&text=Reconstruction+Not+Executed');
 
     var galleryContainer = d3.select('.render-gallery')
     var galleryItem = galleryContainer.selectAll('li')
@@ -102,7 +102,7 @@ ImageAnalyzer.prototype.update = function () {
         })
         .on("click", function (d) {
             if (!isFrozen) {
-                $('#reconst-image').attr('src', 'http://placehold.it/' + d.width / 3 + 'x' + d.height / 3 + '&text=Reconstruction+Not+Executed');
+                $('#reconst-image').attr('src', 'https://placehold.it/' + d.width / 3 + 'x' + d.height / 3 + '&text=Reconstruction+Not+Executed');
                 self.selectedRender.cropper("setDragMode", "crop");
                 self.selectedRender.cropper("replace", self.getURI(d, null));
             }
