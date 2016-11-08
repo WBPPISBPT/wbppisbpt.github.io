@@ -1,0 +1,203 @@
+img {
+    max-width: 100%; /* This rule is very important, please do not ignore this! */
+    image-rendering: optimizeSpeed;             /* STOP SMOOTHING, GIVE ME SPEED  */
+    image-rendering: -moz-crisp-edges;          /* Firefox                        */
+    image-rendering: -o-crisp-edges;            /* Opera                          */
+    image-rendering: -webkit-optimize-contrast; /* Chrome (and eventually Safari) */
+    image-rendering: pixelated; /* Chrome */
+    image-rendering: optimize-contrast;         /* CSS3 Proposed                  */
+    -ms-interpolation-mode: nearest-neighbor;   /* IE8+                           */
+}
+
+canvas {
+    max-width: 100%; /* This rule is very important, please do not ignore this! */
+    image-rendering: optimizeSpeed;             /* STOP SMOOTHING, GIVE ME SPEED  */
+    image-rendering: -moz-crisp-edges;          /* Firefox                        */
+    image-rendering: -o-crisp-edges;            /* Opera                          */
+    image-rendering: -webkit-optimize-contrast; /* Chrome (and eventually Safari) */
+    image-rendering: pixelated; /* Chrome */
+    image-rendering: optimize-contrast;         /* CSS3 Proposed                  */
+    -ms-interpolation-mode: nearest-neighbor;   /* IE8+                           */
+}
+
+footer {
+    position: fixed;
+}
+
+.footer-expanded {
+    bottom: 0;
+}
+
+.footer-collapsed {
+    bottom: -140px;
+}
+
+.log-container {
+    margin-right: 15px;
+}
+
+.full-width {
+    width: 100%;
+}
+
+.top-buffer {
+    margin-top: 20px;
+}
+
+.no-pad{
+    padding: 0;
+}
+
+.animate{
+    transition: all 0.2s ease;
+}
+
+#log {
+    height: 140px;
+    overflow: auto;
+    font-size: 12px;
+    background: rgba(0, 0, 0, 0.8);
+    color: white;
+    font-family: monospace;
+    padding: 0px 20px;
+}
+
+#log::-webkit-scrollbar {
+    width: 12px;
+}
+
+#log::-webkit-scrollbar-track {
+    -webkit-box-shadow: inset 0 0 50px rgb(0, 0, 0);
+    border-radius: 0px;
+}
+
+#log::-webkit-scrollbar-thumb {
+    border-radius: 0px;
+    -webkit-box-shadow: inset 0 0 50px rgb(255, 255, 255);
+}
+
+.log-number {
+    color: cyan;
+}
+
+.log-btn {
+    border-radius: 0px;
+    width: 100%;
+    padding: 0px;
+    background: black !important;
+    border: 0px;
+}
+
+.alert {
+    border-radius: 0px;
+}
+
+.btn {
+    border-radius: 0px;
+}
+
+.btn:focus {
+    outline: 0px !important;
+}
+
+.modal-content{
+    border-radius: 0;
+}
+
+.end-margin {
+    margin-bottom: 140px;
+}
+
+.render-gallery {
+    list-style: none;
+    margin-left: -40px;
+    margin-top: 0px;
+}
+
+.thumbnail {
+    padding: 0;
+    margin-bottom: 34px;
+    background-position: center center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    cursor: pointer;
+}
+
+.carousel-inner > .item > img, .carousel-inner > .item > a > img {
+    width: 100%;
+}
+
+#reconst-outer > img, #render-outer > img {
+    width: 100%;
+}
+
+.cropper-canvas-container {
+    width: 100%;
+    float: left;
+    margin-right: 10px;
+    margin-bottom: 10px;
+}
+
+.cropper-canvas-container > canvas {
+    width: 100%;
+}
+
+#indicator-outer {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
+.selector-circle {
+    stroke: cyan;
+    stroke-width: 1px;
+    fill: rgba(255, 255, 255, 0);
+    cursor: pointer;
+}
+
+.selector-current {
+    stroke: red;
+    stroke-width: 3px;
+}
+
+input[type=range] {
+    -webkit-appearance: none;
+    margin: 10px 0;
+    width: 100%;
+}
+input[type=range]:focus {
+    outline: none;
+}
+input[type=range]::-webkit-slider-runnable-track {
+    width: 100%;
+    height: 12.8px;
+    cursor: pointer;
+    animate: 0.2s;
+    box-shadow: 0px 0px 0px #000000, 0px 0px 0px #0d0d0d;
+    background: #4285f4;
+    border-radius: 0px;
+    border: 0px solid #000101;
+}
+input[type=range]::-webkit-slider-thumb {
+    box-shadow: 0px 0px 0px #000000, 0px 0px 0px #0d0d0d;
+    border: 0px solid #000000;
+    height: 20px;
+    width: 39px;
+    border-radius: 0px;
+    background: #0d47a1;
+    cursor: pointer;
+    -webkit-appearance: none;
+    margin-top: -3.6px;
+}
+input[type=range]:focus::-webkit-slider-runnable-track {
+    background: #4285f4;
+}
+
+.range-info {
+    font-weight: bold;
+}
+
+
+

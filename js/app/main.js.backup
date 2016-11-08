@@ -1,0 +1,43 @@
+/*globals alert, document, d3, console*/
+// These keep JSHint quiet if you're using it (highly recommended!)
+
+var database_URI = "http://localhost:8080";
+
+
+function init() {
+    var query = {"pixel_i" : 64, "pixel_j" : 20};
+
+    var send_data = {"query_string" : JSON.stringify(query)};
+
+    $.ajax({
+        type: "GET"
+        //type: "POST"
+        //crossDomain : true,
+        //cache: false,
+        //url: database_URI + '/getFromCollection/Cameras',
+        , url: database_URI + '/getFromCollection/OriginalCameraPaths'
+        //data: data,
+        , success: function (data, textStatus, jqXHR) {
+            console.log(textStatus)
+            console.log(data)
+            
+        }
+        , error: function (jqXHR, textStatus, errorThrown) {
+            console.log(textStatus);
+            console.log(jqXHR);
+            console.log(errorThrown);
+        }
+
+        // The query.
+        //, data: query
+
+        , data: send_data
+        
+        //, dataType: "json"
+        //dataType: dataType
+    });
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+   init();
+}, false);
