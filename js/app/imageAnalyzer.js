@@ -84,10 +84,10 @@ ImageAnalyzer.prototype.update = function () {
 
     galleryItem.exit().remove();
 
-    var thumbs_li_enter = galleryItem.enter()
+    var galleryItemEnter = galleryItem.enter()
         .append('li');
 
-    galleryItem = galleryItem.merge(thumbs_li_enter);
+    galleryItem = galleryItem.merge(galleryItemEnter);
     galleryItem.classed('col-md-1', true)
         .append('a')
         .classed('thumbnail', true)
@@ -280,6 +280,7 @@ ImageAnalyzer.prototype.freeze = function () {
 };
 
 ImageAnalyzer.prototype.autoDetectFireflies = function () {
+
     var self = this;
     var canvasW = self.cropperCanvas.getAttribute('width');
     var canvasH = self.cropperCanvas.getAttribute('height');
