@@ -1,7 +1,9 @@
+var demo = true;
 var isFrozen = false;
 
+
 /*
- * Root file that handles instances of all the charts and loads the visualization
+ * Root file that handles instances of all the charts, image analyzer and loads the visualization
  */
 (function () {
     var instance = null;
@@ -38,7 +40,7 @@ var isFrozen = false;
 
 
     /**
-     * Creates instances for every chart (classes created to handle each chart;
+     * Creates instances for image analyzer and every chart;
      * the classes are defined in the respective javascript files.
      */
     function init() {
@@ -47,18 +49,20 @@ var isFrozen = false;
         var samplesChart = new SamplesChart();
 
 
-        //load the data corresponding to all the election years
-        //pass this data and instances of all the charts that update on year selection to yearChart's constructor
-        // d3.csv("data/yearwiseWinner.csv", function (error, renders) {
-        //     //pass the instances of all the charts that update on selection change in ImageAnalyzer
-        //     // var yearChart = new ImageAnalyzer(samplesChart, tileChart, pathsChart, renders);
-        //     // yearChart.update();
-        // });
+        // Get the render gallery and load the image analyzer
+        if (demo){
+            d3.json("data/renders.json", function (error, renders) {
+                var imageAnalyzer = new ImageAnalyzer(samplesChart, pathsChart, renders);
+                imageAnalyzer.update();
+            });
+        }
+        else {
+            d3.json("REQUESTP_ORTAL", function (error, renders) {
+                var imageAnalyzer = new ImageAnalyzer(samplesChart, pathsChart, renders);
+                imageAnalyzer.update();
+            });
+        }
 
-        d3.json("data/renders.json", function (error, renders) {
-            var imageAnalyzer = new ImageAnalyzer(samplesChart, pathsChart, renders);
-            imageAnalyzer.update();
-        });
     }
 
     /**
