@@ -1,5 +1,5 @@
 /**
- * ConstructoroutlyingYear Chart
+ * Constructor for ImageAnalyzer
  *
  * @param samplesChart instance of SamplesChart
  * @param pathsChart instance of Vote PathsChart
@@ -33,9 +33,9 @@ ImageAnalyzer.prototype.init = function () {
 };
 
 /**
- * Finds the corresponding URI of the passed render object.
- * If the thumbnail URI doesn't exist, it will return the orignal
- * size URI. If that doesnt exists either returns a placehold.it image.
+ * Finds the corresponding URI of the passed gallery object.
+ * If the thumbnail URI doesn't exist, it will return the original
+ * size URI. If that doesn't exists either returns a placehold.it image.
  * @param d     Render object
  * @param type  'thumb' for thumbnail URI, null for original size
  * @returns {*} URI of thumb, source, or a generic placeholder
@@ -44,7 +44,7 @@ ImageAnalyzer.prototype.getURI = function (d, type) {
     if (type == 'thumb') {
         if (d.thumbnailURI == '' || d.thumbnailURI == null) {
             if (d.sourceURI == '' || d.sourceURI == null) {
-                var placeholder = 'https://placehold.it/' + d.width + 'x' + d.height + '&text=' + d.uid;
+                var placeholder = 'https://unsplash.it/' + d.width + '/' + d.height + '&text=' + d.uid;
                 return placeholder;
             }
             return d.sourceURI;
@@ -55,7 +55,7 @@ ImageAnalyzer.prototype.getURI = function (d, type) {
     }
     else {
         if (d.sourceURI == '' || d.sourceURI == null) {
-            var placeholder = 'https://placehold.it/' + d.width + 'x' + d.height + '&text=' + d.uid;
+            var placeholder = 'https://unsplash.it/' + d.width + '/' + d.height + '&text=' + d.uid;
             return placeholder;
         }
         else {
