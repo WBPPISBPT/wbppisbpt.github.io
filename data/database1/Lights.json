@@ -1,0 +1,24 @@
+{
+	"_id": {
+		"$oid": "5826bccc82ed1def6bab3b5e"
+	},
+	"lightID": 1,
+	"PDF_Choose": 0,
+	"isPhantom": false,
+	"Type": "AreaLightMesh",
+	"intensity": {
+		"r": 640.1463677889327,
+		"g": 640.1463677889327,
+		"b": 640.1463677889327
+	},
+	"origin": {
+		"x": 0,
+		"y": 0,
+		"z": 0
+	},
+	"lightDirection": {
+		"x": 0,
+		"y": 0,
+		"z": 1
+	}
+}
