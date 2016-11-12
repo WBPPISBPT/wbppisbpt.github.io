@@ -1,3 +1,11 @@
+var galleryUIDKey = "uid";
+var galleryThumbURIKey = "thumbnailURI";
+var gallerySourceURIKey = "sourceURI";
+var galleryWidthKey = "width";
+var galleryHeightKey = "height";
+var gallerySamplesCountKey = "samples";
+
+
 /**
  * Constructor for ImageAnalyzer
  *
@@ -42,24 +50,24 @@ ImageAnalyzer.prototype.init = function () {
  */
 ImageAnalyzer.prototype.getURI = function (d, type) {
     if (type == 'thumb') {
-        if (d.thumbnailURI == '' || d.thumbnailURI == null) {
-            if (d.sourceURI == '' || d.sourceURI == null) {
-                var placeholder = 'https://unsplash.it/' + d.width + '/' + d.height + '&text=' + d.uid;
+        if (d[galleryThumbURIKey] == '' || d[galleryThumbURIKey] == null) {
+            if (d[gallerySourceURIKey] == '' || d[gallerySourceURIKey] == null) {
+                var placeholder = 'https://unsplash.it/' + d[galleryWidthKey] + '/' + d[galleryHeightKey] + '&text=' + d[galleryUIDKey];
                 return placeholder;
             }
-            return d.sourceURI;
+            return d[gallerySourceURIKey];
         }
         else {
-            return d.thumbnailURI;
+            return d[galleryThumbURIKey];
         }
     }
     else {
-        if (d.sourceURI == '' || d.sourceURI == null) {
-            var placeholder = 'https://unsplash.it/' + d.width + '/' + d.height + '&text=' + d.uid;
+        if (d[gallerySourceURIKey] == '' || d[gallerySourceURIKey] == null) {
+            var placeholder = 'https://unsplash.it/' + d[galleryWidthKey] + '/' + d[galleryHeightKey] + '&text=' + d[galleryUIDKey];
             return placeholder;
         }
         else {
-            return d.sourceURI;
+            return d[gallerySourceURIKey];
         }
     }
 };
@@ -98,11 +106,11 @@ ImageAnalyzer.prototype.update = function () {
             return 'url(' + self.getURI(d, 'thumb') + ')';
         })
         .attr('id', function (d) {
-            return 'thumb-' + d.uid;
+            return 'thumb-' + d[galleryUIDKey];
         })
         .on("click", function (d) {
             if (!isFrozen) {
-                $('#reconst-image').attr('src', 'https://placehold.it/' + d.width / 3 + 'x' + d.height / 3 + '&text=Reconstruction+Not+Executed');
+                $('#reconst-image').attr('src', 'https://placehold.it/' + d[galleryWidthKey] / 3 + 'x' + + d[galleryHeightKey] / 3 + '&text=Reconstruction+Not+Executed');
                 self.selectedRender.cropper("setDragMode", "crop");
                 self.selectedRender.cropper("replace", self.getURI(d, null));
             }
