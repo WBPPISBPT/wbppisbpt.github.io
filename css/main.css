@@ -199,5 +199,25 @@ input[type=range]:focus::-webkit-slider-runnable-track {
     font-weight: bold;
 }
 
+#input-threshold {
+    margin: 6px 0;
+    height: 42px;
+    padding: 5px;
+    box-sizing: inherit;
+    width: 100%;
+}
+
+#set-threshold {
+    height: 42px;
+    background: #4285f4;
+    border-color: #4285f4;
+}
+
+#set-threshold:hover {
+    background: #0d47a1;
+    border-color: #0d47a1;
+}
+
+
 
 
