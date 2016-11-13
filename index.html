@@ -16,6 +16,8 @@
     <script src="js/libs/bootstrap.min.js" charset="utf-8" type="text/javascript" defer></script>
     <script src="js/libs/cropper.min.js" type="text/javascript" defer></script>
     <script src="js/libs/confirm.js" defer></script>
+    <script src="js/libs/hamsters.js" defer></script>
+
     <script type="application/javascript" src="js/app/imageAnalyzer.js" defer></script>
     <script type="application/javascript" src="js/app/samplesChart.js" defer></script>
     <script type="application/javascript" src="js/app/pathsChart.js" defer></script>
@@ -98,9 +100,21 @@
                     <div id="analyzer-controls">
                         <div id="slider-outer" class="animate" style="display: none;">
                             <div id="auto-pixel-count" class="alert alert-success"></div>
-                            <input id="slider-threshold" type="range" min="1" max="10" step="0.1" value="2"/>
-                            <div class="range-info" style="float:left; ">Most Precise</div>
-                            <div class="range-info" style="float:right; ">Least Precise</div>
+                            <div class="col-xs-8 no-pad">
+                                <input id="slider-threshold" type="range" min="1" max="10" step="0.1" value="2"/>
+                                <div class="range-info" style="float:left; ">Most Precise</div>
+                                <div class="range-info" style="float:right; ">Least Precise</div>
+                                <hr>
+                            </div>
+                            <div class="col-xs-4" style="padding-right:0; ">
+                                <div class="input-group">
+                                    <input id="input-threshold" type="text" placeholder="Manual Input">
+                                    <span class="input-group-btn">
+                                        <button id="set-threshold" class="btn btn-info" type="button">Set</button>
+                                    </span>
+                                </div>
+                            </div>
+
                             <hr>
                             <div class="top-buffer"> </div>
                         </div>
