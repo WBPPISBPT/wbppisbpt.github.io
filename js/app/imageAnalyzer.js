@@ -1,5 +1,13 @@
+var galleryUIDKey = "uid";
+var galleryThumbURIKey = "thumbnailURI";
+var gallerySourceURIKey = "sourceURI";
+var galleryWidthKey = "width";
+var galleryHeightKey = "height";
+var gallerySamplesCountKey = "samples";
+
+
 /**
- * ConstructoroutlyingYear Chart
+ * Constructor for ImageAnalyzer
  *
  * @param samplesChart instance of SamplesChart
  * @param pathsChart instance of Vote PathsChart
@@ -11,6 +19,8 @@ function ImageAnalyzer(samplesChart, pathsChart, renders) {
     self.samplesChart = samplesChart;
     self.pathsChart = pathsChart;
     self.renders = renders;
+
+    // self.MT = new Multithread(2);
     self.init();
 }
 
@@ -33,33 +43,33 @@ ImageAnalyzer.prototype.init = function () {
 };
 
 /**
- * Finds the corresponding URI of the passed render object.
- * If the thumbnail URI doesn't exist, it will return the orignal
- * size URI. If that doesnt exists either returns a placehold.it image.
+ * Finds the corresponding URI of the passed gallery object.
+ * If the thumbnail URI doesn't exist, it will return the original
+ * size URI. If that doesn't exists either returns a placehold.it image.
  * @param d     Render object
  * @param type  'thumb' for thumbnail URI, null for original size
  * @returns {*} URI of thumb, source, or a generic placeholder
  */
 ImageAnalyzer.prototype.getURI = function (d, type) {
     if (type == 'thumb') {
-        if (d.thumbnailURI == '' || d.thumbnailURI == null) {
-            if (d.sourceURI == '' || d.sourceURI == null) {
-                var placeholder = 'https://placehold.it/' + d.width + 'x' + d.height + '&text=' + d.uid;
+        if (d[galleryThumbURIKey] == '' || d[galleryThumbURIKey] == null) {
+            if (d[gallerySourceURIKey] == '' || d[gallerySourceURIKey] == null) {
+                var placeholder = 'https://unsplash.it/' + d[galleryWidthKey] + '/' + d[galleryHeightKey] + '&text=' + d[galleryUIDKey];
                 return placeholder;
             }
-            return d.sourceURI;
+            return d[gallerySourceURIKey];
         }
         else {
-            return d.thumbnailURI;
+            return d[galleryThumbURIKey];
         }
     }
     else {
-        if (d.sourceURI == '' || d.sourceURI == null) {
-            var placeholder = 'https://placehold.it/' + d.width + 'x' + d.height + '&text=' + d.uid;
+        if (d[gallerySourceURIKey] == '' || d[gallerySourceURIKey] == null) {
+            var placeholder = 'https://unsplash.it/' + d[galleryWidthKey] + '/' + d[galleryHeightKey] + '&text=' + d[galleryUIDKey];
             return placeholder;
         }
         else {
-            return d.sourceURI;
+            return d[gallerySourceURIKey];
         }
     }
 };
@@ -98,15 +108,19 @@ ImageAnalyzer.prototype.update = function () {
             return 'url(' + self.getURI(d, 'thumb') + ')';
         })
         .attr('id', function (d) {
-            return 'thumb-' + d.uid;
+            return 'thumb-' + d[galleryUIDKey];
         })
         .on("click", function (d) {
             if (!isFrozen) {
-                $('#reconst-image').attr('src', 'https://placehold.it/' + d.width / 3 + 'x' + d.height / 3 + '&text=Reconstruction+Not+Executed');
+                $('#reconst-image').attr('src', 'https://placehold.it/' + d[galleryWidthKey] / 3 + 'x' + + d[galleryHeightKey] / 3 + '&text=Reconstruction+Not+Executed');
                 self.selectedRender.cropper("setDragMode", "crop");
                 self.selectedRender.cropper("replace", self.getURI(d, null));
             }
         });
+
+
+    $('#input-threshold').val(self.ratioThreshold);
+    $('#slider-threshold').val(self.ratioThreshold);
 
     self.cropper();
 };
@@ -192,14 +206,39 @@ ImageAnalyzer.prototype.updateBrushView = function () {
         $('#indicator-svg').attr('width', $(self.cropperCanvas).width());
         $('#indicator-svg').attr('height', $(self.cropperCanvas).height());
 
+
+        var setPrecision = function (from , to) {
+            $(to).val($(from).val());
+            self.ratioThreshold = $(from).val();
+            if (isFrozen) {
+                self.outlierPixels = [];
+                self.autoDetectFireflies();
+            }
+        };
+
         // Instantiate the accuracy slider
         if (!self.sliderInstantiated) {
             $('#slider-threshold').on("change", function () {
-                self.ratioThreshold = $(this).val();
-                if (isFrozen) {
-                    self.outlierPixels = [];
-                    self.autoDetectFireflies();
-                }
+                setPrecision('#slider-threshold', '#input-threshold');
+            });
+
+            $('#input-threshold').on("change", function () {
+                if ($(this).val() > 10)
+                    $(this).val(10);
+                if ($(this).val() < 1)
+                    $(this).val(1);
+
+                setPrecision('#input-threshold', '#slider-threshold');
+            });
+
+            $('#set-threshold').on("click", function () {
+                var input = $('#input-threshold');
+                if (input.val() > 10)
+                    input.val(10);
+                if (input.val() < 1)
+                    input.val(1);
+
+                setPrecision('#input-threshold', '#slider-threshold');
             });
             self.sliderInstantiated = true;
         }
@@ -245,6 +284,7 @@ ImageAnalyzer.prototype.freeze = function () {
             $('#finalize-freeze-alert').hide();
 
             self.autoDetectFireflies();
+            // self.runDetectThread();
             // Binds an event listener to #selector-container
             self.manualDetectFireflies();
         }
@@ -278,10 +318,24 @@ ImageAnalyzer.prototype.freeze = function () {
         // If else end
     });
 };
+//
+// ImageAnalyzer.prototype.runDetectThread = function() {
+//     var self = this;
+//     var params = {
+//         'self': {
+//         }
+//     };
+//     hamsters.run(params, function() {
+//         // self.autoDetectFireflies(params.self);
+//     }, function() {
+//         // self.drawFireflyIndicators(params.self);
+//     }, hamsters.maxThreads, true);
+// };
 
-ImageAnalyzer.prototype.autoDetectFireflies = function () {
+ImageAnalyzer.prototype.autoDetectFireflies = function (self) {
 
-    var self = this;
+    if (self == undefined || self == null)
+        self = this;
     var canvasW = self.cropperCanvas.getAttribute('width');
     var canvasH = self.cropperCanvas.getAttribute('height');
 
@@ -405,8 +459,9 @@ ImageAnalyzer.prototype.getFirefly = function (event, self) {
     }
 };
 
-ImageAnalyzer.prototype.drawFireflyIndicators = function () {
-    var self = this;
+ImageAnalyzer.prototype.drawFireflyIndicators = function (self) {
+    if (self == undefined || self == null)
+        self = this;
 
     console.log("In Draw");
     var selectorSVG = d3.select('#indicator-svg');
