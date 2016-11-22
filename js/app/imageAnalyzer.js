@@ -32,7 +32,10 @@ ImageAnalyzer.prototype.init = function () {
 
     self.outlierPixels = [];
     self.ratioThreshold = 2;
+    self.selectionThreshold = 80;
     self.previousSelection = -1;
+
+    self.canFreeze = false;
 
 
     self.sliderInstantiated = false;
@@ -112,7 +115,7 @@ ImageAnalyzer.prototype.update = function () {
         })
         .on("click", function (d) {
             if (!isFrozen) {
-                $('#reconst-image').attr('src', 'https://placehold.it/' + d[galleryWidthKey] / 3 + 'x' + + d[galleryHeightKey] / 3 + '&text=Reconstruction+Not+Executed');
+                $('#reconst-image').attr('src', 'https://placehold.it/' + d[galleryWidthKey] / 3 + 'x' + +d[galleryHeightKey] / 3 + '&text=Reconstruction+Not+Executed');
                 self.selectedRender.cropper("setDragMode", "crop");
                 self.selectedRender.cropper("replace", self.getURI(d, null));
             }
@@ -131,10 +134,10 @@ ImageAnalyzer.prototype.update = function () {
  */
 ImageAnalyzer.prototype.cropper = function () {
     var self = this;
-    var $dataX = $('#dataX');
-    var $dataY = $('#dataY');
-    var $dataHeight = $('#dataHeight');
-    var $dataWidth = $('#dataWidth');
+    var $dataX = $('#cropX');
+    var $dataY = $('#cropY');
+    var $dataHeight = $('#cropHeight');
+    var $dataWidth = $('#cropWidth');
     var options = {
         // preview: '.img-preview',
         dragMode: 'crop',
@@ -172,7 +175,8 @@ ImageAnalyzer.prototype.cropper = function () {
             self.updateBrushView()
             if (self.cropperCanvas != undefined) {
                 $('#download').attr('href', self.cropperCanvas.toDataURL('image/jpeg'));
-            };
+            }
+            ;
         },
         'zoom.cropper': function (e) {
             // console.log(e.type, e.ratio);
@@ -194,8 +198,11 @@ ImageAnalyzer.prototype.updateBrushView = function () {
         return false;
     });
 
+    var canvasW = self.cropperCanvas.getAttribute('width');
+    var canvasH = self.cropperCanvas.getAttribute('height');
+    var selectorAlertText;
     // If Canvas is not transparent
-    if (!canvasFirstPixel.data[3] == 0) {
+    if (canvasFirstPixel.data[3] != 0 && canvasH <= self.selectionThreshold && canvasW <= self.selectionThreshold) {
         $(self.cropperCanvas).attr('id', 'cropper-canvas');
         cropperCanvasContainer.html(self.cropperCanvas);
 
@@ -207,7 +214,7 @@ ImageAnalyzer.prototype.updateBrushView = function () {
         $('#indicator-svg').attr('height', $(self.cropperCanvas).height());
 
 
-        var setPrecision = function (from , to) {
+        var setPrecision = function (from, to) {
             $(to).val($(from).val());
             self.ratioThreshold = $(from).val();
             if (isFrozen) {
@@ -247,8 +254,10 @@ ImageAnalyzer.prototype.updateBrushView = function () {
         $('#no-region-alert').hide();
         $('#analyzer-section').show();
 
+        $('#region-guide').show();
+
         $('#region-alert').addClass('alert-info').removeClass('alert-danger');
-        var selectorAlertText = '<strong>Click</strong> to select; <strong>right click</strong> to delete.';
+        selectorAlertText = 'The window above is interactive. Use the following guide to familiarize yourself with the basic operations available.';
         $('#region-alert').html(selectorAlertText);
     }
     else {
@@ -259,8 +268,16 @@ ImageAnalyzer.prototype.updateBrushView = function () {
         $('#no-region-alert').show();
         $('#analyzer-section').hide();
 
+        $('#region-guide').hide();
+
         $('#region-alert').addClass('alert-danger').removeClass('alert-info');
-        var selectorAlertText = 'Selection will appear only after interaction with the <strong>cropbox</strong> above.';
+
+        if (canvasFirstPixel.data[3] == 0)
+            selectorAlertText = 'Selection will appear only after interaction with the <strong>cropbox</strong> above.';
+        else if (canvasH > self.selectionThreshold || canvasW > self.selectionThreshold)
+            selectorAlertText = 'Selection must be within <strong>' + self.selectionThreshold
+                + ' x ' + self.selectionThreshold + '</strong> pixels';
+
         $('#region-alert').html(selectorAlertText);
     }
 };
@@ -318,19 +335,6 @@ ImageAnalyzer.prototype.freeze = function () {
         // If else end
     });
 };
-//
-// ImageAnalyzer.prototype.runDetectThread = function() {
-//     var self = this;
-//     var params = {
-//         'self': {
-//         }
-//     };
-//     hamsters.run(params, function() {
-//         // self.autoDetectFireflies(params.self);
-//     }, function() {
-//         // self.drawFireflyIndicators(params.self);
-//     }, hamsters.maxThreads, true);
-// };
 
 ImageAnalyzer.prototype.autoDetectFireflies = function (self) {
 
@@ -383,7 +387,7 @@ ImageAnalyzer.prototype.autoDetectFireflies = function (self) {
     }
     self.drawFireflyIndicators();
 
-    var pixelCountText = '<strong>' + self.outlierPixels.length + '</strong> outlier pixels were automatically detected. Adjust the preciseness below.';
+    var pixelCountText = '<strong>' + self.outlierPixels.length + "</strong> outlier pixels were automatically detected. Adjust the preciseness below.";
     $('#auto-pixel-count').html(pixelCountText);
 };
 
@@ -484,7 +488,7 @@ ImageAnalyzer.prototype.drawFireflyIndicators = function (self) {
             return d.offsetY;
         })
         .attr('r', function (d) {
-            return Math.sqrt(d.ratio * d.ratio * 2) / 2;
+            return d.ratio/2;
         })
         .on('click', function (d, i) {
             if (self.previousSelection != -1 && self.outlierPixels[self.previousSelection] != undefined) {
@@ -493,11 +497,16 @@ ImageAnalyzer.prototype.drawFireflyIndicators = function (self) {
             }
             self.previousSelection = i;
             d3.select(this).classed('selector-current', true);
+            self.updateSamplesChart(d);
         })
         .on('contextmenu', function (d, i) {
             self.outlierPixels.splice(i, 1);
             d3.select(this).remove();
             return false;
         });
+};
 
+ImageAnalyzer.prototype.updateSamplesChart = function (pixel) {
+    var self = this;
+    self.samplesChart.getData(pixel);
 };

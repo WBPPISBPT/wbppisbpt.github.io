@@ -46,7 +46,7 @@ var isFrozen = false;
     function init() {
         //Creating instances for each visualization
         var pathsChart = new PathsChart();
-        var samplesChart = new SamplesChart();
+        var samplesChart = new SamplesChart(pathsChart);
 
 
         // Get the render gallery and load the image analyzer
