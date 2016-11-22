@@ -54,35 +54,32 @@ SamplesChart.prototype.init = function () {
         self.sort('r');
     });
 
-
-
-
-
     $('#samples-chart-container').hide();
 };
 
 
 SamplesChart.prototype.getData = function (_pixel) {
     var self = this;
-    self.pixel = _pixel;
+    if (self.pixel == undefined || self.pixel.x != _pixel.x || self.pixel.y != _pixel.y){
+        self.pixel = _pixel;
+        self.modified = false;
 
-    self.modified = false;
-
-    // Get the samples data and update the chart
-    if (demo) {
-        d3.json("data/samples.json", function (error, _samples) {
-            $('#samples-chart-container').show();
-            self.samplesOrig = _samples['samples'];
-            self.pixelInfo();
-            self.update();
-        });
-    }
-    else {
-        d3.json("REQUESTP_ORTAL", function (error, _samples) {
-            self.samplesOrig = _samples['samples'];
-            self.pixelInfo();
-            self.update();
-        });
+        // Get the samples data and update the chart
+        if (demo) {
+            d3.json("data/samples.json", function (error, _samples) {
+                $('#samples-chart-container').show();
+                self.samplesOrig = _samples['samples'];
+                self.pixelInfo();
+                self.update();
+            });
+        }
+        else {
+            d3.json("REQUESTP_ORTAL", function (error, _samples) {
+                self.samplesOrig = _samples['samples'];
+                self.pixelInfo();
+                self.update();
+            });
+        }
     }
 };
 
@@ -140,11 +137,6 @@ SamplesChart.prototype.update = function () {
         .append("g")
         .attr("class", "legendQuantile")
         .call(legendQuantile);
-        // .attr("transform", function () {
-        //     var scale = "scale(" + (legendWidth / (122 * colorScale.range().length)) + ")";
-        //     var translate = "translate(" + ((self.svgWidth - legendWidth) / 2) + ", 0)";
-        //     return translate + " " + scale;
-        // });
 
     legend = legend.merge(legendEnter);
 
