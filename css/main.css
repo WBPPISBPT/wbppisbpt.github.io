@@ -220,4 +220,32 @@ input[type=range]:focus::-webkit-slider-runnable-track {
 
 .selection-guide {
     font-weight: bold;
+    height: 50px;
+}
+
+table, td, th {
+    text-align: center;
+}
+
+#samples-chart-outer {
+    width: 100%;
+    height: 175px;
+}
+
+#samples-chart-wrapper{
+    border: 1px solid #b3b3b3;
+    padding-top: 5px;
+}
+
+#samples-controls{
+    padding: 0 0 0 5px;
+    text-align: center;
+}
+
+.samples-chart-button{
+    padding: 2px;
+}
+
+#legend{
+    margin-top: 10px;
 }

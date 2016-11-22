@@ -134,10 +134,10 @@ ImageAnalyzer.prototype.update = function () {
  */
 ImageAnalyzer.prototype.cropper = function () {
     var self = this;
-    var $dataX = $('#dataX');
-    var $dataY = $('#dataY');
-    var $dataHeight = $('#dataHeight');
-    var $dataWidth = $('#dataWidth');
+    var $dataX = $('#cropX');
+    var $dataY = $('#cropY');
+    var $dataHeight = $('#cropHeight');
+    var $dataWidth = $('#cropWidth');
     var options = {
         // preview: '.img-preview',
         dragMode: 'crop',
@@ -202,7 +202,7 @@ ImageAnalyzer.prototype.updateBrushView = function () {
     var canvasH = self.cropperCanvas.getAttribute('height');
     var selectorAlertText;
     // If Canvas is not transparent
-    if (!canvasFirstPixel.data[3] == 0 && canvasH <= self.selectionThreshold && canvasW <= self.selectionThreshold) {
+    if (canvasFirstPixel.data[3] != 0 && canvasH <= self.selectionThreshold && canvasW <= self.selectionThreshold) {
         $(self.cropperCanvas).attr('id', 'cropper-canvas');
         cropperCanvasContainer.html(self.cropperCanvas);
 
@@ -257,7 +257,7 @@ ImageAnalyzer.prototype.updateBrushView = function () {
         $('#region-guide').show();
 
         $('#region-alert').addClass('alert-info').removeClass('alert-danger');
-        selectorAlertText = '<strong>Click</strong> to select; <strong>right click</strong> to delete.';
+        selectorAlertText = 'The window above is interactive. Use the following guide to familiarize yourself with the basic operations available.';
         $('#region-alert').html(selectorAlertText);
     }
     else {
@@ -271,11 +271,13 @@ ImageAnalyzer.prototype.updateBrushView = function () {
         $('#region-guide').hide();
 
         $('#region-alert').addClass('alert-danger').removeClass('alert-info');
-        if (canvasH > self.selectionThreshold || canvasW > self.selectionThreshold)
-            selectorAlertText = 'You selection must be within a <strong>' + self.selectionThreshold
-        + ' x ' + self.selectionThreshold + '</strong> square.';
-        else
+
+        if (canvasFirstPixel.data[3] == 0)
             selectorAlertText = 'Selection will appear only after interaction with the <strong>cropbox</strong> above.';
+        else if (canvasH > self.selectionThreshold || canvasW > self.selectionThreshold)
+            selectorAlertText = 'Selection must be within <strong>' + self.selectionThreshold
+                + ' x ' + self.selectionThreshold + '</strong> pixels';
+
         $('#region-alert').html(selectorAlertText);
     }
 };
@@ -385,7 +387,7 @@ ImageAnalyzer.prototype.autoDetectFireflies = function (self) {
     }
     self.drawFireflyIndicators();
 
-    var pixelCountText = '<strong>' + self.outlierPixels.length + '</strong> outlier pixels were automatically detected. Adjust the preciseness below.';
+    var pixelCountText = '<strong>' + self.outlierPixels.length + "</strong> outlier pixels were automatically detected. Adjust the preciseness below.";
     $('#auto-pixel-count').html(pixelCountText);
 };
 
@@ -495,11 +497,16 @@ ImageAnalyzer.prototype.drawFireflyIndicators = function (self) {
             }
             self.previousSelection = i;
             d3.select(this).classed('selector-current', true);
+            self.updateSamplesChart(d);
         })
         .on('contextmenu', function (d, i) {
             self.outlierPixels.splice(i, 1);
             d3.select(this).remove();
             return false;
         });
+};
 
+ImageAnalyzer.prototype.updateSamplesChart = function (pixel) {
+    var self = this;
+    self.samplesChart.getData(pixel);
 };

@@ -1,273 +1,236 @@
+var sampleUIDKey = "uid";
+var sampleFinalContribKey = "fin_contrib";
+var sampleThroughputKey = "throuput";
+var samplePathsCountKey = "paths_count";
+var sampleTotalProbabilityKey = "tot_prob";
+
 /**
  * Constructor for the SamplesChart
  *
  * @param _shiftChart
  */
-function SamplesChart(_shiftChart) {
+function SamplesChart(_pathsChart) {
     var self = this;
-    self.shiftChart = _shiftChart;
+    self.pathsChart = _pathsChart;
     self.init();
 }
 /**
  * Initializes the svg elements required for this chart
  */
 SamplesChart.prototype.init = function () {
-    // var self = this;
-    // self.margin = {top: 30, right: 20, bottom: 30, left: 50};
-    //
-    // //Gets access to the div element created for this chart from HTML
-    // var divelectoralVotes = d3.select("#electoral-vote").classed("content", true);
-    // self.svgBounds = divelectoralVotes.node().getBoundingClientRect();
-    // self.svgWidth = self.svgBounds.width - self.margin.left - self.margin.right;
-    // self.svgHeight = 110;
-    // //creates svg element within the div
-    // self.svg = divelectoralVotes.append("svg")
-    //     .attr("width", self.svgWidth)
-    //     .attr("height", self.svgHeight)
+    var self = this;
+    self.pixel;
+    self.samplesOrig;
+    self.samples;
+    self.modified = false;
+    var legendHeight = 30;
 
+
+    var self = this;
+    //Gets access to the div element created for this chart from HTML
+    self.divOuter = d3.select("#samples-chart-outer");
+    self.svgBounds = self.divOuter.node().getBoundingClientRect();
+    self.svgWidth = self.svgBounds.width;
+    self.svgHeight = self.svgBounds.height;
+    //creates svg element within the div
+    self.chartSVG = self.divOuter.append("svg")
+        .attr("width", self.svgWidth)
+        .attr("height", self.svgHeight)
+
+    var legend = d3.select("#legend");
+    self.legendSvg = legend.append("svg")
+        .attr("width", self.svgWidth)
+        .attr("height", legendHeight);
+
+    $('#sort-ascending').on("click", function () {
+        self.sort('a');
+    });
+
+    $('#sort-descending').on("click", function () {
+        self.sort('d');
+    });
+
+    $('#sort-reset').on("click", function () {
+        self.sort('r');
+    });
+
+
+
+
+
+    $('#samples-chart-container').hide();
 };
 
-/**
- * Returns the class that needs to be assigned to an element.
- *
- * @param party an ID for the party that is being referred to.
- */
-SamplesChart.prototype.chooseClass = function (party) {
 
-    if (party == "R") {
-        return "republican";
+SamplesChart.prototype.getData = function (_pixel) {
+    var self = this;
+    self.pixel = _pixel;
+
+    self.modified = false;
+
+    // Get the samples data and update the chart
+    if (demo) {
+        d3.json("data/samples.json", function (error, _samples) {
+            $('#samples-chart-container').show();
+            self.samplesOrig = _samples['samples'];
+            self.pixelInfo();
+            self.update();
+        });
     }
-    else if (party == "D") {
-        return "democrat";
-    }
-    else if (party == "I") {
-        return "independent";
+    else {
+        d3.json("REQUESTP_ORTAL", function (error, _samples) {
+            self.samplesOrig = _samples['samples'];
+            self.pixelInfo();
+            self.update();
+        });
     }
 };
 
-/**
- * Creates the stacked bar chart, text content and tool tips for electoral vote chart
- *
- * @param electionResult election data for the year selected
- * @param colorScale global quantile scale based on the winning margin between republicans and democrats
- */
-
-SamplesChart.prototype.update = function (electionResult, colorScale) {
+SamplesChart.prototype.update = function () {
     var self = this;
 
-    /** Object */
-        // console.log(electionResult);
+    if (!self.modified)
+        self.samples = self.samplesOrig.slice(0);
 
-    var totalEV = 0;
-    var indEV = 0;
-    var demEV = 0;
-    var repEV = 0;
-
-    var ind = [];
-    var rep = [];
-    var dem = [];
-
-    electionResult.forEach(function (d) {
-        totalEV += parseInt(d.Total_EV);
-        if (d.RD_Difference == 0) {
-            ind.push(d);
-            indEV += parseFloat(d.Total_EV)
-        }
-        else if (d.RD_Difference > 0) {
-            rep.push(d);
-            repEV += parseFloat(d.Total_EV)
-        }
-        else {
-            dem.push(d);
-            demEV += parseFloat(d.Total_EV)
-        }
-    });
-
-    var midEV = Math.round(totalEV / 20) * 10;
-
-    indEV = Math.round(indEV);
-    demEV = Math.round(demEV);
-    repEV = Math.round(repEV);
-
-    ind.sort(function (a, b) {
-        return a.RD_Difference - b.RD_Difference;
-    });
-
-    dem.sort(function (a, b) {
-        return Math.abs(b.RD_Difference) - Math.abs(a.RD_Difference);
-    });
-
-    rep.sort(function (a, b) {
-        return a.RD_Difference - b.RD_Difference;
-    });
-
-    var final = ind.concat(dem);
-    final = final.concat(rep);
-
-    var xScale = d3.scaleLinear()
-        .domain([0, totalEV])
-        .range([0, self.svgWidth]);
-
-    var barsGroup = self.svg.selectAll(".bars-group")
-        .data([1]);
-
-    barsGroup.exit().remove();
-
-    var barsGroupEnter = barsGroup.enter()
-        .append("g")
-        .classed("bars-group", true);
-
-    barsGroup = barsGroup.merge(barsGroupEnter);
-
-    var bars = barsGroup.selectAll("rect")
-        .data(final);
+    var bars = self.chartSVG.selectAll('rect')
+        .data(self.samples);
 
     bars.exit().remove();
 
     var barsEnter = bars.enter()
-        .append("rect");
+        .append('rect');
 
     bars = bars.merge(barsEnter);
 
-    var lastStart = 0;
+    var barWidth = self.svgWidth / self.samples.length;
 
-    bars.attr("y", 50)
-        .attr("height", 20)
-        .attr("width", function (d) {
-            var currentWidth = xScale(d.Total_EV);
-            d3.select(this).attr("x", function () {
-                return lastStart;
-            });
-            lastStart += currentWidth;
-            return currentWidth;
-        })
-        .classed("electoralVotes", true)
-        .attr("fill", function (d) {
-            if (d.RD_Difference == 0) {
-                return "#009d3e";
-            }
-            return colorScale(d.RD_Difference);
-        });
+    var maxFinContrib = d3.max(self.samples, function (d) {
+        return d[sampleFinalContribKey];
+    });
 
-    var textData = [indEV, demEV, repEV];
-    var text = self.svg.selectAll(".electoralVoteText")
-        .data(textData);
+    var yScale = d3.scaleLinear()
+        .range([self.svgHeight - 20, 0])
+        .domain([0, maxFinContrib]);
 
-    text.exit().remove();
+    var xScale = d3.scaleBand()
+        .range([0, self.svgWidth])
+        .domain(self.samples.map(function (d) {
+            return d[sampleUIDKey];
+        }));
 
-    var textEnter = text.enter()
-        .append("text");
+    var colorScale = d3.scaleQuantile()
+        .range(["#0066CC", "#0080FF", "#3399FF", "#66B2FF","#ff6666", "#ff3333", "#FF0000", "#CC0000"])
+        .domain([0, maxFinContrib]);
 
-    text = text.merge(textEnter);
+    var legendQuantile = d3.legendColor()
+        .shapeWidth(self.svgWidth/8 -2)
+        .shapeHeight(5)
+        .cells(10)
+        .orient('horizontal')
+        .scale(colorScale);
 
-    text.text(function (d) {
-        return d;
-    })
-        .attr("opacity", function (d) {
-            if (d == 0)
-                return 0;
-            else
-                return 1;
-        })
-        .attr("y", 40)
-        .attr("x", function (d, i) {
-            if (i == 0)
-                return 0;
-            else if (i == 1)
-                return xScale(indEV);
-            else
-                return self.svgWidth;
-        })
-        .attr("class", function (d, i) {
-            if (i == 0)
-                return self.chooseClass("I");
-            else if (i == 1)
-                return self.chooseClass("D");
-            else
-                return self.chooseClass("R");
-        })
-        .classed("electoralVoteText", true);
-
-    var line = self.svg.selectAll(".ev-line")
+    var legend = self.legendSvg.selectAll(".legendQuantile")
         .data([1]);
 
-    line.exit().remove();
+    legend.exit().remove();
 
-    var lineEnter = line.enter()
-        .append("path");
+    var legendWidth = self.svgWidth / (1.4);
 
-    line = line.merge(lineEnter);
-    line.attr("class", "ev-line ")
-        .attr("d", function () {
-            return "M  " + self.svgWidth / 2 + " 40 L " + self.svgWidth / 2 + " 80";
-        })
-        .attr("x", 0)
-        .attr("y", 0);
-
-    var infoText = self.svg.selectAll(".ev-text")
-        .data([1]);
-
-    infoText.exit().remove();
-
-    var infoTextEnter = infoText.enter()
-        .append("text");
-
-    infoText = infoText.merge(infoTextEnter);
-
-    infoText.text("Electoral Vote (" + midEV + " needed to win)")
-        .attr("y", 30)
-        .attr("x", self.svgWidth / 2)
-        .attr("class", "ev-text")
-        .attr('transform', function () {
-            var bounds = d3.select(this).node().getBoundingClientRect();
-            var width = bounds.width;
-
-            return "translate(" + (width / -2) + ", 0)";
-        });
-
-    var brush = d3.brushX()
-        .extent([[0, 0], [self.svgWidth, 30]])
-        .on("start brush end", brushmoved);
-
-    var brushGroup = self.svg.selectAll(".brush")
-        .data([1]);
-
-    brushGroup.exit().remove();
-
-    var brushGroupEnter = brushGroup.enter()
+    var legendEnter = legend.enter()
         .append("g")
-        .classed("brush", true)
-        .attr("transform", "translate(0,45)")
-        .call(brush);
+        .attr("class", "legendQuantile")
+        .call(legendQuantile);
+        // .attr("transform", function () {
+        //     var scale = "scale(" + (legendWidth / (122 * colorScale.range().length)) + ")";
+        //     var translate = "translate(" + ((self.svgWidth - legendWidth) / 2) + ", 0)";
+        //     return translate + " " + scale;
+        // });
 
-    brushGroup = brushGroup.merge(brushGroupEnter);
+    legend = legend.merge(legendEnter);
 
-    var brushSelection = [];
+    bars
+        .attr("x", function (d) {
+            return xScale(d[sampleUIDKey]);
+        })
+        .attr("y", function (d) {
+            return yScale(d[sampleFinalContribKey]);
+        })
+        .attr("width", barWidth-2)
+        .attr("height", function (d) {
+            return self.svgHeight - yScale(d[sampleFinalContribKey]);
+        })
+        .attr('fill', function (d) {
+            return colorScale(d[sampleFinalContribKey]);
+        });
+};
 
-    function brushmoved() {
-        var s = null;
-        try {
-            s = d3.event.selection;
-        } catch (error) {
-        }
-        if (s != null){
-            self.selection = s;
-        }
-        if (self.selection == null) {
-            brushSelection = [];
-        } else {
-            brushSelection = [];
-            bars.classed("", function(d) {
-                var x1 = this.x.baseVal.value;
-                var x2 = x1 + this.width.baseVal.value;
-                if (self.selection[0] <= x1 && x2 <= self.selection[1]){
-                    brushSelection.push(d.Abbreviation);
+SamplesChart.prototype.pixelInfo = function () {
+    var self = this;
 
-                }
-            });
-        }
-        self.shiftChart.update(brushSelection);
+    function hex(x) {
+        return ("0" + parseInt(x).toString(16)).slice(-2);
     }
 
-    try { brushmoved(); } catch (error){}
+    function hexToRgb(hex) {
+        var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+        return result ? {
+            r: parseInt(result[1], 16),
+            g: parseInt(result[2], 16),
+            b: parseInt(result[3], 16)
+        } : null;
+    }
+
+    function color(x) {
+        var mid = 255 / 2;
+        if (x.r) {
+            if (x.r >= mid && x.g >= mid && x.b >= mid)
+                return 'black';
+            else
+                return 'white';
+        }
+        else if (x >= mid)
+            return 'white';
+        else
+            return 'black';
+    }
+
+    $('#pixelX').text(self.pixel.x);
+    $('#pixelY').text(self.pixel.y);
+
+    var pixelColor = "#" + hex(self.pixel.colorR) + hex(self.pixel.colorG) + hex(self.pixel.colorB);
+
+    $('#pixelCol').css("background", pixelColor);
+    $('#pixelCol').css("color", color(hexToRgb(pixelColor)));
+    $('#pixelCol').text(pixelColor.toUpperCase());
+
+    $('#pixelRed').css("background", "rgba(255, 0, 0, " + self.pixel.colorR / 255 + ")");
+    $('#pixelRed').text(self.pixel.colorR);
+    $('#pixelRed').css("color", color(self.pixel.colorR));
+
+    $('#pixelGreen').css("background", "rgba(0, 255, 0, " + self.pixel.colorG / 255 + ")");
+    $('#pixelGreen').text(self.pixel.colorG);
+    $('#pixelGreen').css("color", color(self.pixel.colorG));
+
+    $('#pixelBlue').css("background", "rgba(0, 0, 255, " + self.pixel.colorB / 255 + ")");
+    $('#pixelBlue').text(self.pixel.colorB);
+    $('#pixelBlue').css("color", color(self.pixel.colorB));
+};
+
+SamplesChart.prototype.sort = function (param) {
+    var self = this;
+    switch (param) {
+        case 'r':
+            self.modified = false;
+            self.samples = self.samplesOrig.slice(0);
+            break;
+        case 'a':
+            self.modified = true;
+            self.samples = self.samples.sort(function (a,b) {return d3.ascending(a[sampleFinalContribKey], b[sampleFinalContribKey]); });
+            break;
+        case 'd':
+            self.modified = true;
+            self.samples = self.samples.sort(function (a,b) {return d3.descending(a[sampleFinalContribKey], b[sampleFinalContribKey]); });
+            break;
+    }
+    self.update();
 };
