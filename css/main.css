@@ -218,6 +218,6 @@ input[type=range]:focus::-webkit-slider-runnable-track {
     border-color: #0d47a1;
 }
 
-
-
-
+.selection-guide {
+    font-weight: bold;
+}
