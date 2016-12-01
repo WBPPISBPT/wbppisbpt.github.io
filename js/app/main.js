@@ -1,5 +1,6 @@
 var demo = true;
 var isFrozen = false;
+var removedSamples = {};
 
 
 /*

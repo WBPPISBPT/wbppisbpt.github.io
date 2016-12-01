@@ -14,35 +14,54 @@ var gallerySamplesCountKey = "samples";
  * @param renders data corresponding to render thumbnail gallery
  */
 function ImageAnalyzer(samplesChart, pathsChart, renders) {
-    var self = this;
+    var s = this;
 
-    self.samplesChart = samplesChart;
-    self.pathsChart = pathsChart;
-    self.renders = renders;
+    s.samplesChart = samplesChart;
+    s.pathsChart = pathsChart;
+    s.renders = renders;
 
-    // self.MT = new Multithread(2);
-    self.init();
+    // s.MT = new Multithread(2);
+    s.init();
 }
 
 
 ImageAnalyzer.prototype.init = function () {
+    var s = this;
+    s.selectedRender;
+    s.cropperCanvas;
+    s.oldCropBoxData;
 
-    var self = this;
-    self.selectedRender;
+    s.outlierPixels = [];
+    s.ratioThreshold = 2;
+    s.selectionThreshold = 80;
+    s.previousSelection = -1;
 
-    self.outlierPixels = [];
-    self.ratioThreshold = 2;
-    self.selectionThreshold = 80;
-    self.previousSelection = -1;
-
-    self.canFreeze = false;
+    s.canFreeze = false;
 
 
-    self.sliderInstantiated = false;
-    self.sliderOnChange = false;
+    s.sliderInstantiated = false;
+    s.sliderOnChange = false;
 
-    self.cropperCanvas;
+    s.croppedCanvas;
 
+    if (demo) {
+        var pixel = {
+            colorA: 255,
+            colorB: 255,
+            colorG: 255,
+            colorR: 252,
+            key: "504-391",
+            offsetX: 228.3227848101266,
+            offsetY: 221.29746835443038,
+            ratio: 7.025316455696203,
+            selected: true,
+            x: 504,
+            y: 391
+        }
+
+        this.updateSamplesChart(pixel);
+
+    }
 };
 
 /**
@@ -83,17 +102,16 @@ ImageAnalyzer.prototype.getURI = function (d, type) {
  * render.
  */
 ImageAnalyzer.prototype.update = function () {
-    var self = this;
-    self.selectedRender = $('#render-image');
+    var s = this;
+    s.selectedRender = $('#render-image');
 
-    var renderWidth = self.selectedRender[0].naturalWidth;
-    var renderHeight = self.selectedRender[0].naturalHeight;
-    console.log(self.selectedRender[0].naturalHeight);
+    var renderWidth = s.selectedRender[0].naturalWidth;
+    var renderHeight = s.selectedRender[0].naturalHeight;
     $('#reconst-image').attr('src', 'https://placehold.it/' + renderWidth / 3 + 'x' + renderHeight / 3 + '&text=Reconstruction+Not+Executed');
 
     var galleryContainer = d3.select('.render-gallery')
     var galleryItem = galleryContainer.selectAll('li')
-        .data(self.renders['renders']);
+        .data(s.renders['renders']);
 
     galleryItem.exit().remove();
 
@@ -108,7 +126,7 @@ ImageAnalyzer.prototype.update = function () {
             return d3.select(this).node().getBoundingClientRect().width + 'px';
         })
         .style('background-image', function (d) {
-            return 'url(' + self.getURI(d, 'thumb') + ')';
+            return 'url(' + s.getURI(d, 'thumb') + ')';
         })
         .attr('id', function (d) {
             return 'thumb-' + d[galleryUIDKey];
@@ -116,16 +134,17 @@ ImageAnalyzer.prototype.update = function () {
         .on("click", function (d) {
             if (!isFrozen) {
                 $('#reconst-image').attr('src', 'https://placehold.it/' + d[galleryWidthKey] / 3 + 'x' + +d[galleryHeightKey] / 3 + '&text=Reconstruction+Not+Executed');
-                self.selectedRender.cropper("setDragMode", "crop");
-                self.selectedRender.cropper("replace", self.getURI(d, null));
+                s.selectedRender.cropper("setDragMode", "crop");
+                s.selectedRender.cropper("replace", s.getURI(d, null));
+                removedSamples = {};
             }
         });
 
 
-    $('#input-threshold').val(self.ratioThreshold);
-    $('#slider-threshold').val(self.ratioThreshold);
+    $('#input-threshold').val(s.ratioThreshold);
+    $('#slider-threshold').val(s.ratioThreshold);
 
-    self.cropper();
+    s.cropper();
 };
 
 /**
@@ -133,64 +152,134 @@ ImageAnalyzer.prototype.update = function () {
  * @param selectedRender Jquery selection.
  */
 ImageAnalyzer.prototype.cropper = function () {
-    var self = this;
-    var $dataX = $('#cropX');
-    var $dataY = $('#cropY');
-    var $dataHeight = $('#cropHeight');
-    var $dataWidth = $('#cropWidth');
+    var s = this;
+    var dataX = $('#cropX');
+    var dataY = $('#cropY');
+    var dataHeight = $('#cropHeight');
+    var dataWidth = $('#cropWidth');
     var options = {
         // preview: '.img-preview',
         dragMode: 'crop',
         viewMode: 3,
         modal: false,
-        autoCropArea: 0.2,
         crop: function (e) {
-            $dataX.text(Math.round(e.x) + 'px');
-            $dataY.text(Math.round(e.y) + 'px');
-            $dataHeight.text(Math.round(e.height) + 'px');
-            $dataWidth.text(Math.round(e.width) + 'px');
+            dataX.text(Math.round(e.x) + 'px');
+            dataY.text(Math.round(e.y) + 'px');
+            dataHeight.text(Math.min(Math.round(e.height), s.selectionThreshold) + 'px');
+            dataWidth.text(Math.min(Math.round(e.width), s.selectionThreshold) + 'px');
         }
     };
 
     // Initialize
-    self.selectedRender.on({
+    s.selectedRender.on({
         'build.cropper': function (e) {
-            // console.log(e.type);
+            // e.type
         },
         'built.cropper': function (e) {
-            // console.log(e.type);
+            // e.type
+            s.cropperCanvas = $('.cropper-canvas');
+            s.cropBoxSize('get');
+            s.cropBoxSize('init');
         },
         'cropstart.cropper': function (e) {
-            // console.log(e.type, e.action);
+            // e.type, e.action
+            s.cropBoxSize('get');
         },
         'cropmove.cropper': function (e) {
-            // console.log(e.type, e.action);
+            // e.type, e.action
         },
         'cropend.cropper': function (e) {
-            // console.log(e.type, e.action);
-            self.selectedRender.cropper("setDragMode", "move");
+            // e.type, e.action
+            s.selectedRender.cropper("setDragMode", "move");
+            s.cropBoxSize('get');
         },
         'crop.cropper': function (e) {
-            // console.log(e.type, e.x, e.y, e.width, e.height, e.rotate, e.scaleX, e.scaleY);
-            self.updateBrushView()
-            if (self.cropperCanvas != undefined) {
-                $('#download').attr('href', self.cropperCanvas.toDataURL('image/jpeg'));
-            }
-            ;
+            // e.type, e.x, e.y, e.width, e.height, e.rotate, e.scaleX, e.scaleY
+
+            s.cropBoxSize('set', e);
+
+            s.updateBrushView();
+
+            if (s.croppedCanvas != undefined)
+                $('#download').attr('href', s.croppedCanvas.toDataURL('image/jpeg'));
         },
         'zoom.cropper': function (e) {
-            // console.log(e.type, e.ratio);
-            self.updateBrushView()
+            s.cropBoxSize('get');
+            s.updateBrushView();
         }
     }).cropper(options);
 
-    self.freeze();
+    s.freeze();
+};
+
+ImageAnalyzer.prototype.cropBoxSize = function (param, event) {
+    var s = this;
+    s.modifyCropBox = false;
+
+    if (param == 'get')
+        s.oldCropBoxData = s.selectedRender.cropper("getCropBoxData");
+    else {
+        var realTimeCropBoxData = s.selectedRender.cropper("getCropBoxData");
+        var width = (s.cropperCanvas.width() * s.selectionThreshold) / s.selectedRender[0].naturalWidth;
+        var height = (s.cropperCanvas.height() * s.selectionThreshold) / s.selectedRender[0].naturalHeight;
+
+        switch (param) {
+            case 'init' :
+                realTimeCropBoxData.width = width;
+                realTimeCropBoxData.height = height;
+                realTimeCropBoxData.left = (s.cropperCanvas.width() - width) / 2;
+                realTimeCropBoxData.top = (s.cropperCanvas.height() - height) / 2;
+                s.modifyCropBox = true;
+                break;
+            case 'set' :
+                if (event.width >= s.selectionThreshold + 0.5) {
+                    var leftDecreasing = realTimeCropBoxData.left < s.oldCropBoxData.left;
+                    var widthIncreasing = s.oldCropBoxData.width < realTimeCropBoxData.width;
+
+                    if (leftDecreasing && widthIncreasing) {
+                        realTimeCropBoxData.left = s.oldCropBoxData.left;
+                        s.modifyCropBox = true;
+                        break;
+                    }
+                    realTimeCropBoxData.width = width;
+                    s.modifyCropBox = true;
+                    break;
+                }
+                else if (event.width < s.selectionThreshold + 0.5) {
+                    if (s.oldCropBoxData.left > realTimeCropBoxData.left) {
+                        s.oldCropBoxData.left = realTimeCropBoxData.left;
+                        s.modifyCropBox = false;
+                        break;
+                    }
+                }
+                if (event.height >= s.selectionThreshold + 0.5) {
+                    if (s.oldCropBoxData.top > realTimeCropBoxData.top && s.oldCropBoxData.height < realTimeCropBoxData.height) {
+                        realTimeCropBoxData.top = s.oldCropBoxData.top;
+                        s.modifyCropBox = true;
+                        break;
+                    }
+                    realTimeCropBoxData.height = height;
+                    s.modifyCropBox = true;
+                    break;
+                }
+                else if (event.height < s.selectionThreshold + 0.5) {
+                    if (s.oldCropBoxData.top > realTimeCropBoxData.top) {
+                        s.oldCropBoxData.top = realTimeCropBoxData.top;
+                        s.modifyCropBox = false;
+                        break;
+                    }
+                }
+        }
+
+        if (s.modifyCropBox)
+            s.selectedRender.cropper("setCropBoxData", realTimeCropBoxData);
+    }
 };
 
 ImageAnalyzer.prototype.updateBrushView = function () {
-    var self = this;
-    self.cropperCanvas = self.selectedRender.cropper('getCroppedCanvas');
-    var canvasFirstPixel = self.cropperCanvas.getContext('2d').getImageData(0, 0, 1, 1);
+    var s = this;
+    s.croppedCanvas = s.selectedRender.cropper('getCroppedCanvas');
+    var canvasFirstPixel = s.croppedCanvas.getContext('2d').getImageData(0, 0, 1, 1);
     var cropperCanvasContainer = $('.cropper-canvas-container');
     var indicatorOuter = $('#indicator-outer');
 
@@ -198,33 +287,31 @@ ImageAnalyzer.prototype.updateBrushView = function () {
         return false;
     });
 
-    var canvasW = self.cropperCanvas.getAttribute('width');
-    var canvasH = self.cropperCanvas.getAttribute('height');
     var selectorAlertText;
     // If Canvas is not transparent
-    if (canvasFirstPixel.data[3] != 0 && canvasH <= self.selectionThreshold && canvasW <= self.selectionThreshold) {
-        $(self.cropperCanvas).attr('id', 'cropper-canvas');
-        cropperCanvasContainer.html(self.cropperCanvas);
+    if (canvasFirstPixel.data[3] != 0) {
+        $(s.croppedCanvas).attr('id', 'cropper-canvas');
+        cropperCanvasContainer.html(s.croppedCanvas);
 
         // Set the size of the indicator SVG container
-        indicatorOuter.css('height', $(self.cropperCanvas).height());
+        indicatorOuter.css('height', $(s.croppedCanvas).height());
 
         // Set the size of the indicator SVG
-        $('#indicator-svg').attr('width', $(self.cropperCanvas).width());
-        $('#indicator-svg').attr('height', $(self.cropperCanvas).height());
+        $('#indicator-svg').attr('width', $(s.croppedCanvas).width());
+        $('#indicator-svg').attr('height', $(s.croppedCanvas).height());
 
 
         var setPrecision = function (from, to) {
             $(to).val($(from).val());
-            self.ratioThreshold = $(from).val();
+            s.ratioThreshold = $(from).val();
             if (isFrozen) {
-                self.outlierPixels = [];
-                self.autoDetectFireflies();
+                s.outlierPixels = [];
+                s.autoDetectFireflies();
             }
         };
 
         // Instantiate the accuracy slider
-        if (!self.sliderInstantiated) {
+        if (!s.sliderInstantiated) {
             $('#slider-threshold').on("change", function () {
                 setPrecision('#slider-threshold', '#input-threshold');
             });
@@ -247,43 +334,33 @@ ImageAnalyzer.prototype.updateBrushView = function () {
 
                 setPrecision('#input-threshold', '#slider-threshold');
             });
-            self.sliderInstantiated = true;
+            s.sliderInstantiated = true;
         }
 
         // Update HTML elements.
-        $('#no-region-alert').hide();
-        $('#analyzer-section').show();
+        $('#analyzer-region').fadeIn( 350, 'linear' );
 
-        $('#region-guide').show();
-
-        $('#region-alert').addClass('alert-info').removeClass('alert-danger');
-        selectorAlertText = 'The window above is interactive. Use the following guide to familiarize yourself with the basic operations available.';
+        $('#region-alert').addClass('alert-success').removeClass('alert-danger');
+        selectorAlertText = "<p> </p>The cropbox is limited to <strong>" + s.selectionThreshold + "x" + s.selectionThreshold + "</strong> pixels which should be sufficient for most analyses. When you are satisfied with your selection, you can proceed with detection.";
         $('#region-alert').html(selectorAlertText);
     }
     else {
         // Remove the canvas since no region exists.
         cropperCanvasContainer.html('');
 
-        // Update HTML elements.
-        $('#no-region-alert').show();
-        $('#analyzer-section').hide();
+        // // Update HTML elements.
+        $('#analyzer-region').fadeOut( 350, 'linear' );
 
-        $('#region-guide').hide();
+        $('#region-alert').addClass('alert-danger').removeClass('alert-success');
 
-        $('#region-alert').addClass('alert-danger').removeClass('alert-info');
-
-        if (canvasFirstPixel.data[3] == 0)
-            selectorAlertText = 'Selection will appear only after interaction with the <strong>cropbox</strong> above.';
-        else if (canvasH > self.selectionThreshold || canvasW > self.selectionThreshold)
-            selectorAlertText = 'Selection must be within <strong>' + self.selectionThreshold
-                + ' x ' + self.selectionThreshold + '</strong> pixels';
+        selectorAlertText = "<p> </p>The <strong>first step</strong> of analysis is to select a region from the image using the <strong>cropbox</strong> above.";
 
         $('#region-alert').html(selectorAlertText);
     }
 };
 
 ImageAnalyzer.prototype.freeze = function () {
-    var self = this;
+    var s = this;
 
     var finalizeButton = $('#finalize-selection');
     finalizeButton.click(function () {
@@ -291,42 +368,65 @@ ImageAnalyzer.prototype.freeze = function () {
             isFrozen = true;
 
             // Freeze cropper
-            self.selectedRender.cropper('disable');
+            s.selectedRender.cropper('disable');
 
-            $('#slider-outer').show();
+            $('#slider-outer').fadeIn( 350, 'linear' );
 
             // Update UI
-            finalizeButton.text('Unfreeze Selection');
+            finalizeButton.text('Discard Detection');
             finalizeButton.addClass('btn-danger').removeClass('btn-success');
-            $('#finalize-freeze-alert').hide();
 
-            self.autoDetectFireflies();
-            // self.runDetectThread();
+            $('#render-region').addClass('is-frozen');
+            $('#gallery-region').addClass('is-frozen');
+            $( ".thumbnail" ).each(function( index ) {
+                $( this ).addClass('is-frozen');
+            });
+            $('#is-frozen-message').fadeIn( 350, 'linear',  function() {
+                $('html, body').animate({
+                    scrollTop: $("#analyzer-region").offset().top
+                }, 200);
+            });
+
+
+            s.autoDetectFireflies();
+
             // Binds an event listener to #selector-container
-            self.manualDetectFireflies();
+            s.manualDetectFireflies();
         }
         else if (isFrozen)
-            Confirm.show('Are you sure?', 'All of your selections will be lost', {
-                'Unfreeze': {
+            Confirm.show('Discard Detection', 'All of your manual changes will be discarded. <br>Are you sure you want to proceed?', {
+                'Discard': {
                     'primary': true,
                     'callback': function () {
 
                         // Unfreeze cropper
-                        self.selectedRender.cropper('enable');
+                        s.selectedRender.cropper('enable');
 
-                        $('#slider-outer').hide();
+                        $('#slider-outer').fadeOut( 350, 'linear' );
 
                         // Update UI
-                        finalizeButton.text('Freeze Selection');
+                        finalizeButton.text('Begin Detection');
                         finalizeButton.addClass('btn-success').removeClass('btn-danger');
-                        $('#finalize-freeze-alert').show();
+
+                        $('#render-region').removeClass('is-frozen');
+                        $('#gallery-region').removeClass('is-frozen');
+                        $( ".thumbnail" ).each(function( index ) {
+                            $( this ).removeClass('is-frozen');
+                        });
+                        
+                        $('#is-frozen-message').fadeOut( 350, 'linear',  function() {
+                            $('html, body').animate({
+                                scrollTop: $("#render-region").offset().top
+                            }, 200);
+                        });
+
 
                         // Unbinds an event listener from #selector-container
                         $('#indicator-outer').off("click");
 
                         // Remove all previously selected pixels
-                        self.outlierPixels = [];
-                        self.drawFireflyIndicators();
+                        s.outlierPixels = [];
+                        s.drawFireflyIndicators();
                         isFrozen = false;
                         Confirm.hide();
                     }
@@ -336,14 +436,14 @@ ImageAnalyzer.prototype.freeze = function () {
     });
 };
 
-ImageAnalyzer.prototype.autoDetectFireflies = function (self) {
+ImageAnalyzer.prototype.autoDetectFireflies = function (s) {
 
-    if (self == undefined || self == null)
-        self = this;
-    var canvasW = self.cropperCanvas.getAttribute('width');
-    var canvasH = self.cropperCanvas.getAttribute('height');
+    if (s == undefined || s == null)
+        s = this;
+    var canvasW = s.croppedCanvas.getAttribute('width');
+    var canvasH = s.croppedCanvas.getAttribute('height');
 
-    var pixelData = self.cropperCanvas.getContext('2d').getImageData(0, 0, canvasW, canvasH);
+    var pixelData = s.croppedCanvas.getContext('2d').getImageData(0, 0, canvasW, canvasH);
     pixelData = pixelData.data;
 
     var row = canvasW * 4;
@@ -372,35 +472,36 @@ ImageAnalyzer.prototype.autoDetectFireflies = function (self) {
             blueAverage /= 8;
 
             var firefly =
-                pixelData[i] / redAverage >= self.ratioThreshold &&
-                pixelData[i + 1] / greenAverage >= self.ratioThreshold &&
-                pixelData[i + 2] / blueAverage >= self.ratioThreshold;
+                pixelData[i] / redAverage >= s.ratioThreshold &&
+                pixelData[i + 1] / greenAverage >= s.ratioThreshold &&
+                pixelData[i + 2] / blueAverage >= s.ratioThreshold;
             if (firefly) {
                 var mainIndex = i / 4;
                 var event = {};
                 event.x = mainIndex % canvasW;
                 event.y = Math.floor(mainIndex / canvasW);
-                self.getFirefly(event, self);
+                s.getFirefly(event, s);
             }
         }
 
     }
-    self.drawFireflyIndicators();
 
-    var pixelCountText = '<strong>' + self.outlierPixels.length + "</strong> outlier pixels were automatically detected. Adjust the preciseness below.";
-    $('#auto-pixel-count').html(pixelCountText);
+    var pixelCountText = "<strong>" + s.outlierPixels.length + "</strong> outlier pixels were automatically detected.";
+    $('#finalize-freeze-alert').html(pixelCountText);
+
+    s.drawFireflyIndicators();
 };
 
 ImageAnalyzer.prototype.manualDetectFireflies = function () {
-    var self = this;
+    var s = this;
 
     $('#indicator-outer').click(function (event) {
-        self.getFirefly(event, self);
+        s.getFirefly(event, s);
     });
 };
 
-ImageAnalyzer.prototype.getFirefly = function (event, self) {
-    var cropData = self.selectedRender.cropper('getData');
+ImageAnalyzer.prototype.getFirefly = function (event, s) {
+    var cropData = s.selectedRender.cropper('getData');
     var cropCanvas = d3.select("#cropper-canvas");
     var cropCanvasBounds = cropCanvas.node().getBoundingClientRect();
 
@@ -417,7 +518,7 @@ ImageAnalyzer.prototype.getFirefly = function (event, self) {
         .range([cdY, cdY + cdH])
         .domain([0, cropCanvasBounds.height]);
 
-    var ratio = $(self.cropperCanvas).width() / cdW;
+    var ratio = $(s.croppedCanvas).width() / cdW;
 
     if (event.target) {
         var x = event.offsetX;
@@ -433,7 +534,7 @@ ImageAnalyzer.prototype.getFirefly = function (event, self) {
         y = cdY + event.y;
     }
 
-    var pixelRGBA = self.cropperCanvas.getContext('2d').getImageData(x - cdX, y - cdY, 1, 1);
+    var pixelRGBA = s.croppedCanvas.getContext('2d').getImageData(x - cdX, y - cdY, 1, 1);
 
     var currentPixel = {};
     currentPixel.key = x + '-' + y;
@@ -448,29 +549,28 @@ ImageAnalyzer.prototype.getFirefly = function (event, self) {
     currentPixel.colorA = pixelRGBA.data[3];
     currentPixel.selected = false;
 
-    var index = self.outlierPixels.findIndex(function (element) {
+    var index = s.outlierPixels.findIndex(function (element) {
         return element.key == currentPixel.key;
     });
     if (index >= 0) {
-        self.outlierPixels[index].selected = true;
+        s.outlierPixels[index].selected = true;
     }
     else {
-        self.outlierPixels.push(currentPixel);
+        s.outlierPixels.push(currentPixel);
     }
 
     if (event.target) {
-        self.drawFireflyIndicators();
+        s.drawFireflyIndicators();
     }
 };
 
-ImageAnalyzer.prototype.drawFireflyIndicators = function (self) {
-    if (self == undefined || self == null)
-        self = this;
+ImageAnalyzer.prototype.drawFireflyIndicators = function (s) {
+    if (s == undefined || s == null)
+        s = this;
 
-    console.log("In Draw");
     var selectorSVG = d3.select('#indicator-svg');
     var circles = selectorSVG.selectAll("circle")
-        .data(self.outlierPixels);
+        .data(s.outlierPixels);
 
     circles.exit().remove();
 
@@ -488,25 +588,28 @@ ImageAnalyzer.prototype.drawFireflyIndicators = function (self) {
             return d.offsetY;
         })
         .attr('r', function (d) {
-            return d.ratio/2;
+            return d.ratio / 2;
         })
         .on('click', function (d, i) {
-            if (self.previousSelection != -1 && self.outlierPixels[self.previousSelection] != undefined) {
-                self.outlierPixels[self.previousSelection].selected = false;
+            if (s.previousSelection != -1 && s.outlierPixels[s.previousSelection] != undefined) {
+                s.outlierPixels[s.previousSelection].selected = false;
                 d3.select('.selector-current').classed('selector-current', false);
             }
-            self.previousSelection = i;
+            s.previousSelection = i;
             d3.select(this).classed('selector-current', true);
-            self.updateSamplesChart(d);
+            s.updateSamplesChart(d);
+            $('html, body').animate({
+                scrollTop: $("#samples-region").offset().top
+            }, 200);
         })
         .on('contextmenu', function (d, i) {
-            self.outlierPixels.splice(i, 1);
+            s.outlierPixels.splice(i, 1);
             d3.select(this).remove();
-            return false;
+            // return false;
         });
 };
 
 ImageAnalyzer.prototype.updateSamplesChart = function (pixel) {
-    var self = this;
-    self.samplesChart.getData(pixel);
+    var s = this;
+    s.samplesChart.getData(pixel);
 };

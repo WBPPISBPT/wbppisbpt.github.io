@@ -11,10 +11,11 @@
     <link rel="stylesheet" href="css/main.css">
     <link rel="stylesheet" href="css/cropper.min.css">
 
-    <script src="js/libs/d3.v4.min.js" charset="utf-8" defer></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3-legend/2.9.0/d3-legend.js" defer></script>
-    <script src="js/libs/jquery-3.1.1.min.js" charset="utf-8" defer></script>
-    <script src="js/libs/bootstrap.min.js" charset="utf-8" defer></script>
+    <script src="js/libs/d3.v4.min.js" defer></script>
+    <script src="js/libs/d3-legend.js" defer></script>
+    <script src="js/libs/jquery-3.1.1.min.js" defer></script>
+    <script src="js/libs/jquery-scrollto.js" defer></script>
+    <script src="js/libs/bootstrap.min.js" defer></script>
     <script src="js/libs/cropper.min.js" defer></script>
     <script src="js/libs/confirm.js" defer></script>
     <script src="js/libs/hamsters.js" defer></script>
@@ -27,220 +28,318 @@
 </head>
 <body>
 
-<div class="container">
-    <div id="main_area">
+<div class="container-fluid no-pad">
+
+    <div class="fullWidthContent">
         <div class="row">
-            <div class="col-sm-12 col-sm-12">
-                <h3>Available Renders</h3>
-                <ul class="render-gallery">
-                </ul>
-            </div>
-
-        </div>
-        <div class="row top-buffer">
-            <div class="col-md-6">
-                <h3>Render</h3>
-                <div class="col-xs-12">
-                    <div id="render-outer" class="row">
-                        <img id="render-image" src="data/corona.jpg">
-                        <!--<img id="render-image" src="http://placehold.it/50x50&text=Not+Render+Selected">-->
-                    </div>
-                </div>
-                <div class="alert alert-info">
-                    <p> </p>
-                    The window above is interactive. Use the following guide to familiarize yourself with the basic
-                    operations available.
-                </div>
-                <div class="selection-guide col-md-4">
-                    <img src="https://maxcdn.icons8.com/iOS7/PNG/25/Computer_Hardware/scrolling-25.png"
-                         title="Mouse Scrolling" width="25">
-                    Zoom
-                </div>
-                <div class="selection-guide col-md-4">
-                    <img src="https://maxcdn.icons8.com/iOS7/PNG/25/Computer_Hardware/left_click_filled-25.png"
-                         title="Mouse Left Click Filled" width="25">
-                    Drag
-                </div>
-                <div class="selection-guide col-md-4">
-                    <img src="https://maxcdn.icons8.com/Android/PNG/32/Editing/resize-32.png" title="Resize" width="25">
-                    Resize
-                </div>
-            </div>
-            <div class="col-md-6">
-                <h3>Reconstruction</h3>
-                <div class="col-xs-12">
-                    <div id="reconst-outer" class="row">
-                        <img id="reconst-image" src="">
-                    </div>
-                </div>
-                <div class="alert alert-info">
-                    <p> </p>
-                    Reconstruction will occur at the <strong>paths level</strong>. You must select a firefly first, and
-                    proceed to choose a sample and paths.
-                </div>
-            </div>
-        </div>
-
-        <div class="row top-buffer">
-            <div class="col-md-6">
-                <h3>Analyzer Region</h3>
-                <div class="col-xs-12">
-                    <div id="cropper-outer" class="row">
-                        <div class="cropper-canvas-container preview-lg"></div>
-                    </div>
-                    <div id="indicator-outer">
-                        <svg id="indicator-svg"></svg>
-                    </div>
-                </div>
-                <div id="region-alert" class="alert alert-danger">
-                    Selection will appear only after interaction with the <strong>cropbox</strong> above.
-                </div>
-                <div id="region-guide" style="display: none;">
-                    <div class="selection-guide col-md-4">
-                        <img src="https://maxcdn.icons8.com/iOS7/PNG/25/Computer_Hardware/left_click_filled-25.png"
-                             title="Mouse Left Click Filled" width="25">
-                        Select Pixel
-                    </div>
-                    <div class="selection-guide col-md-4">
-                        <img src="https://maxcdn.icons8.com/iOS7/PNG/25/Computer_Hardware/left_click_filled-25.png"
-                             title="Mouse Left Click Filled" width="25">
-                        Analyze Selection
-                    </div>
-                    <div class="selection-guide col-md-4">
-                        <img src="https://maxcdn.icons8.com/iOS7/PNG/25/Computer_Hardware/right_click_filled-25.png"
-                             title="Mouse Right Click Filled" width="25">
-                        Remove Selection
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-6">
-                <h3>Analyzer Controls</h3>
-                <div id="no-region-alert" class="alert alert-danger">
-                    You have not selected a legal region yet.
-                </div>
-                <div id="analyzer-section">
-                    <button id="finalize-selection" class="btn btn-success full-width">Freeze Selection</button>
-
-                    <div id="finalize-freeze-alert" class="alert alert-success">
-                        You must freeze your selection in order to select outliers.
-                    </div>
-
-                    <div id="finalize-unfreeze-alert" class="alert alert-danger" style="display: none;">
-                        All changes will be lost. Proceed with caution.
-                    </div>
-
-                    <div id="analyzer-controls">
-                        <div id="slider-outer" class="animate" style="display: none;">
-                            <div id="auto-pixel-count" class="alert alert-success"></div>
-                            <div class="col-xs-8 no-pad">
-                                <input id="slider-threshold" type="range" min="1" max="10" step="0.1" value="2"/>
-                                <div class="range-info" style="float:left; ">Most Precise</div>
-                                <div class="range-info" style="float:right; ">Least Precise</div>
-                                <hr>
-                            </div>
-                            <div class="col-xs-4" style="padding-right:0; ">
-                                <div class="input-group">
-                                    <input id="input-threshold" type="text" placeholder="Manual Input">
-                                    <span class="input-group-btn">
-                                        <button id="set-threshold" class="btn btn-info" type="button">Set</button>
-                                    </span>
-                                </div>
-                            </div>
-
-                            <hr>
-                            <div class="top-buffer"> </div>
+            <div class="col-sm-12">
+                <div class="container">
+                    <div id="gallery-region" class="row">
+                        <div class="col-sm-12 col-sm-12">
+                            <h3>Available Renders</h3>
+                            <ul class="render-gallery">
+                            </ul>
                         </div>
-
-                        <table class="table table-hover">
-                            <thead>
-                            <tr>
-                                <th>Left</th>
-                                <th>Right</th>
-                                <th>Width</th>
-                                <th>Height</th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            <tr>
-                                <td id="cropX"></td>
-                                <td id="cropY"></td>
-                                <td id="cropWidth"></td>
-                                <td id="cropHeight"></td>
-                            </tr>
-                            </tbody>
-                        </table>
-                        <hr>
-                        <a id="download" class="btn btn-info full-width" href="#" download="cropped.jpg">Download
-                            the
-                            Selected Region</a>
                     </div>
-
                 </div>
             </div>
         </div>
     </div>
+
+    <div id="render-region" class="fullWidthContent">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="container">
+                    <div class="row top-buffer">
+                        <div class="col-md-12">
+                            <h3>Render</h3>
+                            <div class="col-xs-12">
+                                <div id="render-outer" class="row">
+                                    <img id="render-image" src="data/images/image4.jpg">
+                                    <!--<img id="render-image" src="http://placehold.it/50x50&text=Not+Render+Selected">-->
+                                </div>
+                            </div>
+                            <div id="region-alert" class="alert alert-danger">
+                                <p> </p>
+                                The window above is interactive. Use the following guide to familiarize yourself with
+                                the basic
+                                operations available.
+                            </div>
+                            <div class="selection-guide col-md-2">
+                                <img src="https://maxcdn.icons8.com/iOS7/PNG/25/Computer_Hardware/scrolling-25.png"
+                                     title="Mouse Wheel" width="25">
+                                Zoom
+                            </div>
+                            <div class="selection-guide col-md-2">
+                                <img src="https://maxcdn.icons8.com/iOS7/PNG/25/Computer_Hardware/left_click_filled-25.png"
+                                     title="Mouse Left Click" width="25">
+                                Drag
+                            </div>
+                            <div class="selection-guide col-md-2">
+                                <img src="https://maxcdn.icons8.com/Android/PNG/32/Editing/resize-32.png"
+                                     title="Box Corners"
+                                     width="25">
+                                Resize
+                            </div>
+                        </div>
+                        <!--<div class="col-md-6">-->
+                        <!--<h3>Reconstruction</h3>-->
+                        <!--<div class="col-xs-12">-->
+                        <!--<div id="reconst-outer" class="row">-->
+                        <!--<img id="reconst-image" src="">-->
+                        <!--</div>-->
+                        <!--</div>-->
+                        <!--<div class="alert alert-info">-->
+                        <!--<p> </p>-->
+                        <!--Reconstruction will occur at the <strong>paths level</strong>. You must select a firefly first, and-->
+                        <!--proceed to choose a sample and paths.-->
+                        <!--</div>-->
+                        <!--</div>-->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="fullWidthContent">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="container">
+                    <!--BEGIN-->
+                    <div id="is-frozen-message" class="row top-buffer" style="display: none;">
+                        <div class="col-md-12">
+                            <div id="is-frozen-message-alert" class="alert alert-danger">
+                                The above modules have been locked to prevent loss of analysis data. In order to select
+                                a different
+                                render or change the cropped region, you must unlock these modules by clicking on
+                                <strong>Discard
+                                    Detection</strong> below.
+                            </div>
+                        </div>
+                    </div>
+                    <!--END-->
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <div id="analyzer-region" class="fullWidthContent">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="container">
+                    <!--BEGIN-->
+                    <div class="row top-buffer">
+                        <div class="col-md-6">
+                            <h3>Analyzer Region</h3>
+                            <div class="col-xs-12">
+                                <div id="cropper-outer" class="row">
+                                    <div class="cropper-canvas-container preview-lg"></div>
+                                </div>
+                                <div id="indicator-outer">
+                                    <svg id="indicator-svg"></svg>
+                                </div>
+                            </div>
+
+                            <div id="region-guide">
+                                <div class="selection-guide col-md-4">
+                                    <img src="https://maxcdn.icons8.com/iOS7/PNG/25/Computer_Hardware/left_click_filled-25.png"
+                                         title="Mouse Left Click" width="25">
+                                    Select Pixel
+                                </div>
+                                <div class="selection-guide col-md-4">
+                                    <img src="https://maxcdn.icons8.com/iOS7/PNG/25/Computer_Hardware/left_click_filled-25.png"
+                                         title="Mouse Left Click" width="25">
+                                    Analyze Selection
+                                </div>
+                                <div class="selection-guide col-md-4">
+                                    <img src="https://maxcdn.icons8.com/iOS7/PNG/25/Computer_Hardware/right_click_filled-25.png"
+                                         title="Mouse Right Click" width="25">
+                                    Remove Selection
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <h3> </h3>
+                            <div id="analyzer-section">
+                                <button id="finalize-selection" class="btn btn-success full-width">Begin Detection
+                                </button>
+
+                                <div id="finalize-freeze-alert" class="alert alert-success">
+                                    This step is <strong>necessary</strong>. Once the detection process is initiated,
+                                    your cropbox
+                                    will be analyzed for fireflies. Furthermore you can manually select fireflies.
+                                </div>
+
+                                <div id="analyzer-controls">
+                                    <div id="slider-outer" style="display: none;">
+                                        <div class="hr-section">
+                                            <span>Detection Precision</span>
+                                        </div>
+                                        <div class="col-xs-8 no-pad">
+
+                                            <input id="slider-threshold" type="range" min="1" max="10" step="0.1"
+                                                   value="2"/>
+                                            <div class="range-info" style="float:left; ">Most Precise</div>
+                                            <div class="range-info" style="float:right; ">Least Precise</div>
+                                            <hr>
+                                        </div>
+                                        <div class="col-xs-4" style="padding-right:0; ">
+                                            <div class="input-group">
+                                                <input id="input-threshold" type="text" placeholder="Manual Input">
+                                                <span class="input-group-btn">
+                                        <button id="set-threshold" class="btn btn-info"
+                                                type="button">Set Precision</button>
+                                    </span>
+                                            </div>
+                                        </div>
+
+                                        <hr>
+                                        <div class="top-buffer"> </div>
+                                    </div>
+                                    <div class="hr-section">
+                              <span>
+                                  Crop Box Info
+                              </span>
+                                    </div>
+                                    <table class="table table-hover">
+                                        <thead>
+                                        <tr>
+                                            <th>Left</th>
+                                            <th>Top</th>
+                                            <th>Width</th>
+                                            <th>Height</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        <tr>
+                                            <td id="cropX"></td>
+                                            <td id="cropY"></td>
+                                            <td id="cropWidth"></td>
+                                            <td id="cropHeight"></td>
+                                        </tr>
+                                        </tbody>
+                                    </table>
+                                    <hr>
+                                    <a id="download" class="btn btn-info full-width" href="#" download="cropped.jpg">Download
+                                        the
+                                        croppped region</a>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                    <!--END-->
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <div id="samples-region" class="fullWidthContent">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="container">
+                    <!--BEGIN-->
+                    <div id="samples-chart-container" class="row top-buffer">    <!-- Row Start -->
+                        <div class="col-md-12">
+                            <h2>Pixel Information & Samples</h2>
+
+                            <table class="table table-bordered  pixel-table" style="float: left">
+                                <thead>
+                                <tr class="pixel-info">
+                                    <td id="pixelX"></td>
+                                    <td id="pixelY"></td>
+                                    <td id="pixelCol"></td>
+                                    <td id="pixelRed"></td>
+                                    <td id="pixelGreen"></td>
+                                    <td id="pixelBlue"></td>
+                                </tr>
+                                </thead>
+                            </table>
+
+                            <button type="button" id="sort-reset" class="btn samples-chart-button btn-default">
+                                <img src="https://maxcdn.icons8.com/windows8/PNG/26/Computer_Hardware/restart-26.png"
+                                     title="Reset to Original" width="26">
+                            </button>
+
+                            <button type="button" id="sort-ascending" class="btn samples-chart-button btn-default">
+                                <img src="https://maxcdn.icons8.com/windows8/PNG/26/Data/Generic_Sorting-26.png"
+                                     title="Ascending Sort" width="26" style="transform: scaleY(-1) rotate(90deg);">
+                            </button>
+
+                            <button type="button" id="sort-descending" class="btn samples-chart-button btn-default">
+                                <img src="https://maxcdn.icons8.com/windows8/PNG/26/Data/Generic_Sorting-26.png"
+                                     title="Descending Sort" width="26" style="transform: rotate(-90deg);">
+                            </button>
+
+                            <div id="samples-chart-wrapper" class="col-md-12">
+                                <div id="legend"></div>
+                                <div id="samples-chart-outer"></div>
+                            </div>
+
+                            <div>
+                                <div class="selection-guide col-md-2">
+                                    <img src="https://maxcdn.icons8.com/iOS7/PNG/25/Computer_Hardware/left_click_filled-25.png"
+                                         title="Mouse Left Click" width="25">
+                                    Analyze Sample
+                                </div>
+                                <div class="selection-guide col-md-2">
+                                    <img src="https://maxcdn.icons8.com/iOS7/PNG/25/Computer_Hardware/right_click_filled-25.png"
+                                         title="Mouse Right Click" width="25">
+                                    Remove Sample
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!--END-->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="paths-region" class="fullWidthContent">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="container">
+                    <!--BEGIN-->
+                    <div id="paths-chart-container" class="row top-buffer">    <!-- Row Start -->
+                        <div class="col-md-12">
+                            <h2>Paths</h2>
+
+                            <table class="table table-bordered  paths-table" style="float: left">
+                                <tbody class="paths-table-body">
+
+                                </tbody>
+
+                            </table>
+                        </div>
+                    </div>
+                    <!--END-->
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="fullWidthContent">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="container">
+                    <!--BEGIN-->
+
+                    <!--END-->
+                </div>
+            </div>
+        </div>
+    </div>
+
+
 </div>
 
 
-<div id="samples-chart-container" class="container end-margin">
-    <div class="row top-buffer">    <!-- Row Start -->
-        <div class="col-md-10">
-            <h2>Samples</h2>
-            <div id="samples-chart-wrapper" class="col-md-11">
-                <div id="samples-chart-outer"></div>
-                <div id="legend"></div>
-            </div>
-            <div id="samples-controls" class="col-md-1">
-                <button type="button" id="sort-descending" class="btn samples-chart-button btn-default">
-                    <img src="https://maxcdn.icons8.com/windows8/PNG/26/Data/Generic_Sorting-26.png"
-                         title="Descending Sorting" width="26">
-                </button>
-                <p></p>
-                <button type="button" id="sort-ascending" class="btn samples-chart-button btn-default">
-                    <img src="https://maxcdn.icons8.com/windows8/PNG/26/Data/Generic_Sorting-26.png"
-                         title="Ascending Sorting" width="26" style="transform: scaleY(-1);">
-                </button>
-                <p></p>
-                <button type="button" id="sort-reset" class="btn samples-chart-button btn-default">
-                    <img src="https://maxcdn.icons8.com/windows8/PNG/26/Computer_Hardware/restart-26.png"
-                         title="Restart" width="26">
-                </button>
-            </div>
-        </div>
-        <div class="col-md-2">
-            <h2>Pixel Info</h2>
-            <table class="table table-hover">
-                <thead>
-                <tr>
-                    <th>X</th>
-                    <td id="pixelX"></td>
-                </tr>
-                <tr>
-                    <th>Y</th>
-                    <td id="pixelY"></td>
-                </tr>
-                <tr>
-                    <th>Color</th>
-                    <td id="pixelCol"></td>
-                </tr>
-                <tr>
-                    <th>Red</th>
-                    <td id="pixelRed"></td>
-                </tr>
-                <tr>
-                    <th>Green</th>
-                    <td id="pixelGreen"></td>
-                </tr>
-                <tr>
-                    <th>Blue</th>
-                    <td id="pixelBlue"></td>
-                </tr>
-                </thead>
-            </table>
-        </div>
-    </div>                <!-- Row End -->
 
-    <hr>
+<hr>
 </div>
 <div class="container">
     <footer class="footer-collapsed">
