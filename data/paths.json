@@ -1,0 +1,108 @@
+{
+	"paths": [
+		{"uid": "PATH1", "fin_contrib": 0.1, "throuput": 0.1, "tot_prob": 0.16,
+			"vertices": [
+				{"obj_name": "OBJ_1", "mat_name": "MAT_1", "mat_type": "Diffuse", "prob": 0.16},
+				{"obj_name": "OBJ_2", "mat_name": "MAT_2", "mat_type": "Glossy", "prob": 0.16},
+				{"obj_name": "OBJ_3", "mat_name": "MAT_3", "mat_type": "Emission", "prob": 0.16},
+				{"obj_name": "OBJ_4", "mat_name": "MAT_4", "mat_type": "Diffuse", "prob": 0.16},
+				{"obj_name": "OBJ_5", "mat_name": "MAT_5", "mat_type": "Glossy", "prob": 0.16},
+				{"obj_name": "OBJ_6", "mat_name": "MAT_6", "mat_type": "Emission", "prob": 0.16},
+				{"obj_name": "OBJ_7", "mat_name": "MAT_7", "mat_type": "Diffuse", "prob": 0.16},
+				{"obj_name": "OBJ_8", "mat_name": "MAT_8", "mat_type": "Glossy", "prob": 0.16},
+				{"obj_name": "OBJ_9", "mat_name": "MAT_9", "mat_type": "Emission", "prob": 0.16}
+			]
+		},
+		{"uid": "PATH2", "fin_contrib": 0.1, "throuput": 0.1, "tot_prob": 0.16,
+			"vertices": [
+				{"obj_name": "OBJ_1", "mat_name": "MAT_1", "mat_type": "Diffuse", "prob": 0.16},
+				{"obj_name": "OBJ_2", "mat_name": "MAT_2", "mat_type": "Glossy", "prob": 0.16},
+				{"obj_name": "OBJ_3", "mat_name": "MAT_3", "mat_type": "Emission", "prob": 0.16},
+				{"obj_name": "OBJ_4", "mat_name": "MAT_4", "mat_type": "Diffuse", "prob": 0.16},
+				{"obj_name": "OBJ_5", "mat_name": "MAT_5", "mat_type": "Glossy", "prob": 0.16},
+				{"obj_name": "OBJ_6", "mat_name": "MAT_6", "mat_type": "Emission", "prob": 0.16},
+				{"obj_name": "OBJ_7", "mat_name": "MAT_7", "mat_type": "Diffuse", "prob": 0.16},
+				{"obj_name": "OBJ_8", "mat_name": "MAT_8", "mat_type": "Glossy", "prob": 0.16},
+				{"obj_name": "OBJ_9", "mat_name": "MAT_9", "mat_type": "Emission", "prob": 0.16}
+			]
+		},
+		{"uid": "PATH3", "fin_contrib": 0.1, "throuput": 0.1, "tot_prob": 0.16,
+			"vertices": [
+				{"obj_name": "OBJ_1", "mat_name": "MAT_1", "mat_type": "Diffuse", "prob": 0.16},
+				{"obj_name": "OBJ_2", "mat_name": "MAT_2", "mat_type": "Glossy", "prob": 0.16},
+				{"obj_name": "OBJ_3", "mat_name": "MAT_3", "mat_type": "Emission", "prob": 0.16},
+				{"obj_name": "OBJ_4", "mat_name": "MAT_4", "mat_type": "Diffuse", "prob": 0.16},
+				{"obj_name": "OBJ_5", "mat_name": "MAT_5", "mat_type": "Glossy", "prob": 0.16},
+				{"obj_name": "OBJ_6", "mat_name": "MAT_6", "mat_type": "Emission", "prob": 0.16},
+				{"obj_name": "OBJ_7", "mat_name": "MAT_7", "mat_type": "Diffuse", "prob": 0.16},
+				{"obj_name": "OBJ_8", "mat_name": "MAT_8", "mat_type": "Glossy", "prob": 0.16},
+				{"obj_name": "OBJ_9", "mat_name": "MAT_9", "mat_type": "Emission", "prob": 0.16}
+			]
+		},
+		{"uid": "PATH4", "fin_contrib": 0.1, "throuput": 0.1, "tot_prob": 0.16,
+			"vertices": [
+				{"obj_name": "OBJ_1", "mat_name": "MAT_1", "mat_type": "Diffuse", "prob": 0.16},
+				{"obj_name": "OBJ_2", "mat_name": "MAT_2", "mat_type": "Glossy", "prob": 0.16},
+				{"obj_name": "OBJ_3", "mat_name": "MAT_3", "mat_type": "Emission", "prob": 0.16},
+				{"obj_name": "OBJ_4", "mat_name": "MAT_4", "mat_type": "Diffuse", "prob": 0.16},
+				{"obj_name": "OBJ_5", "mat_name": "MAT_5", "mat_type": "Glossy", "prob": 0.16},
+				{"obj_name": "OBJ_6", "mat_name": "MAT_6", "mat_type": "Emission", "prob": 0.16},
+				{"obj_name": "OBJ_7", "mat_name": "MAT_7", "mat_type": "Diffuse", "prob": 0.16},
+				{"obj_name": "OBJ_8", "mat_name": "MAT_8", "mat_type": "Glossy", "prob": 0.16},
+				{"obj_name": "OBJ_9", "mat_name": "MAT_9", "mat_type": "Emission", "prob": 0.16}
+			]
+		},
+		{"uid": "PATH5", "fin_contrib": 0.1, "throuput": 0.1, "tot_prob": 0.16,
+			"vertices": [
+				{"obj_name": "OBJ_1", "mat_name": "MAT_1", "mat_type": "Diffuse", "prob": 0.16},
+				{"obj_name": "OBJ_2", "mat_name": "MAT_2", "mat_type": "Glossy", "prob": 0.16},
+				{"obj_name": "OBJ_3", "mat_name": "MAT_3", "mat_type": "Emission", "prob": 0.16},
+				{"obj_name": "OBJ_4", "mat_name": "MAT_4", "mat_type": "Diffuse", "prob": 0.16},
+				{"obj_name": "OBJ_5", "mat_name": "MAT_5", "mat_type": "Glossy", "prob": 0.16},
+				{"obj_name": "OBJ_6", "mat_name": "MAT_6", "mat_type": "Emission", "prob": 0.16},
+				{"obj_name": "OBJ_7", "mat_name": "MAT_7", "mat_type": "Diffuse", "prob": 0.16},
+				{"obj_name": "OBJ_8", "mat_name": "MAT_8", "mat_type": "Glossy", "prob": 0.16},
+				{"obj_name": "OBJ_9", "mat_name": "MAT_9", "mat_type": "Emission", "prob": 0.16}
+			]
+		},
+		{"uid": "PATH6", "fin_contrib": 0.1, "throuput": 0.1, "tot_prob": 0.16,
+			"vertices": [
+				{"obj_name": "OBJ_1", "mat_name": "MAT_1", "mat_type": "Diffuse", "prob": 0.16},
+				{"obj_name": "OBJ_2", "mat_name": "MAT_2", "mat_type": "Glossy", "prob": 0.16},
+				{"obj_name": "OBJ_3", "mat_name": "MAT_3", "mat_type": "Emission", "prob": 0.16},
+				{"obj_name": "OBJ_4", "mat_name": "MAT_4", "mat_type": "Diffuse", "prob": 0.16},
+				{"obj_name": "OBJ_5", "mat_name": "MAT_5", "mat_type": "Glossy", "prob": 0.16},
+				{"obj_name": "OBJ_6", "mat_name": "MAT_6", "mat_type": "Emission", "prob": 0.16},
+				{"obj_name": "OBJ_7", "mat_name": "MAT_7", "mat_type": "Diffuse", "prob": 0.16},
+				{"obj_name": "OBJ_8", "mat_name": "MAT_8", "mat_type": "Glossy", "prob": 0.16},
+				{"obj_name": "OBJ_9", "mat_name": "MAT_9", "mat_type": "Emission", "prob": 0.16}
+			]
+		},
+		{"uid": "PATH7", "fin_contrib": 0.1, "throuput": 0.1, "tot_prob": 0.16,
+			"vertices": [
+				{"obj_name": "OBJ_1", "mat_name": "MAT_1", "mat_type": "Diffuse", "prob": 0.16},
+				{"obj_name": "OBJ_2", "mat_name": "MAT_2", "mat_type": "Glossy", "prob": 0.16},
+				{"obj_name": "OBJ_3", "mat_name": "MAT_3", "mat_type": "Emission", "prob": 0.16},
+				{"obj_name": "OBJ_4", "mat_name": "MAT_4", "mat_type": "Diffuse", "prob": 0.16},
+				{"obj_name": "OBJ_5", "mat_name": "MAT_5", "mat_type": "Glossy", "prob": 0.16},
+				{"obj_name": "OBJ_6", "mat_name": "MAT_6", "mat_type": "Emission", "prob": 0.16},
+				{"obj_name": "OBJ_7", "mat_name": "MAT_7", "mat_type": "Diffuse", "prob": 0.16},
+				{"obj_name": "OBJ_8", "mat_name": "MAT_8", "mat_type": "Glossy", "prob": 0.16},
+				{"obj_name": "OBJ_9", "mat_name": "MAT_9", "mat_type": "Emission", "prob": 0.16}
+			]
+		},
+		{"uid": "PATH8", "fin_contrib": 0.1, "throuput": 0.1, "tot_prob": 0.16,
+			"vertices": [
+				{"obj_name": "OBJ_1", "mat_name": "MAT_1", "mat_type": "Diffuse", "prob": 0.16},
+				{"obj_name": "OBJ_2", "mat_name": "MAT_2", "mat_type": "Glossy", "prob": 0.16},
+				{"obj_name": "OBJ_3", "mat_name": "MAT_3", "mat_type": "Emission", "prob": 0.16},
+				{"obj_name": "OBJ_4", "mat_name": "MAT_4", "mat_type": "Diffuse", "prob": 0.16},
+				{"obj_name": "OBJ_5", "mat_name": "MAT_5", "mat_type": "Glossy", "prob": 0.16},
+				{"obj_name": "OBJ_6", "mat_name": "MAT_6", "mat_type": "Emission", "prob": 0.16},
+				{"obj_name": "OBJ_7", "mat_name": "MAT_7", "mat_type": "Diffuse", "prob": 0.16},
+				{"obj_name": "OBJ_8", "mat_name": "MAT_8", "mat_type": "Glossy", "prob": 0.16},
+				{"obj_name": "OBJ_9", "mat_name": "MAT_9", "mat_type": "Emission", "prob": 0.16}
+			]
+		}
+	]
+}

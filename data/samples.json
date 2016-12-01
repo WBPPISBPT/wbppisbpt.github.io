@@ -1,9 +1,9 @@
 {
 	"samples": [
-		{"uid": "TEST1", "fin_contrib": 0.532, "throuput": 0.1, "paths_count": 14, "tot_prob": 0.16},
-		{"uid": "TEST2", "fin_contrib": 0.542, "throuput": 0.1, "paths_count": 17, "tot_prob": 0.17},
-		{"uid": "TEST3", "fin_contrib": 0.505, "throuput": 0.1, "paths_count": 14, "tot_prob": 0.13},
-		{"uid": "TEST4", "fin_contrib": 0.589, "throuput": 0.1, "paths_count": 18, "tot_prob": 0.19},
+		{"uid": "TEST1", "fin_contrib": 0.1, "throuput": 0.1, "paths_count": 14, "tot_prob": 0.16},
+		{"uid": "TEST2", "fin_contrib": 0.2, "throuput": 0.1, "paths_count": 17, "tot_prob": 0.17},
+		{"uid": "TEST3", "fin_contrib": 0.3, "throuput": 0.1, "paths_count": 14, "tot_prob": 0.13},
+		{"uid": "TEST4", "fin_contrib": 0.4, "throuput": 0.1, "paths_count": 18, "tot_prob": 0.19},
 		{"uid": "TEST5", "fin_contrib": 0.445, "throuput": 0.1, "paths_count": 16, "tot_prob": 0.11},
 		{"uid": "TEST6", "fin_contrib": 0.565, "throuput": 0.1, "paths_count": 11, "tot_prob": 0.17},
 		{"uid": "TEST7", "fin_contrib": 0.578, "throuput": 0.1, "paths_count": 18, "tot_prob": 0.18},

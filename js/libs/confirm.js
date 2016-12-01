@@ -1,164 +1,179 @@
-
 var Confirm = {
 
-	modalContainerId : '#modal-container',
-	modalBackgroundId : '#modal-background',
-	modalMainId : '#confirm-modal',
-	customButton : {
-		'Okay' : 
-		{
-			'primary' : true,
-			'callback' : function()
-			{
-				Confirm.hide();
-			}
-		}
-	},
-	customEvent : null,
+    modalContainerId: '#modal-container',
+    modalBackgroundId: '#modal-background',
+    modalMainId: '#confirm-modal',
+    customButton: {
+        'Okay': {
+            'primary': true,
+            'callback': function () {
+                Confirm.hide();
+            }
+        }
+    },
+    customEvent: null,
 
-	init : function(modalSize)
-	{
-		var self = this;
-		var ElemHtml = '';
+    init: function (modalSize) {
+        var self = this;
+        var ElemHtml = '';
 
-		modalSize = 'md';
+        modalSize = 'md';
 
-		$(self.modalMainId).remove();
+        $(self.modalMainId).remove();
 
-		ElemHtml = '<div id="confirm-modal" class="modal fade role="dialog" tabindex="-1">'
-				 +     '<div class="modal-dialog modal-'+ modalSize +'">'
-				 +		 '<div class="modal-content">'
-				 +				'<div class="modal-header">'
-				 +					'<button id="modal-upper-close" class="close modal-close" aria-label="Close" type="button" title="Close">'
-				 +						'<span aria-hidden="true">×</span>'
-				 +					'</button>'
-				 +					'<h4 id="modal-title" class="modal-title">Modal Title</h4>'
-				 +				'</div>'
-				 +				'<div id="modal-body" class="modal-body"> Modal Message </div>'
-				 +		        '<div id="modal-footer" class="modal-footer">'
-				 +		        '</div>'
-				 +			'</div>'
-				 +		'</div>'
-				 +	'</div>'
-				 +  '<div id="modal-background" class=""></div>';
+        ElemHtml = '<div id="confirm-modal" class="modal fade role="dialog" tabindex="-1">'
+            + '<div class="modal-dialog modal-' + modalSize + '">'
+            + '<div class="modal-content">'
+            + '<div class="modal-header">'
+            + '<button id="modal-upper-close" class="close modal-close" aria-label="Close" type="button" title="Close">'
+            + '<span aria-hidden="true">×</span>'
+            + '</button>'
+            + '<h4 id="modal-title" class="modal-title">Modal Title</h4>'
+            + '</div>'
+            + '<div id="modal-body" class="modal-body"> Modal Message </div>'
+            + '<div id="modal-footer" class="modal-footer">'
+            + '</div>'
+            + '</div>'
+            + '</div>'
+            + '</div>'
+            + '<div id="modal-background" class=""></div>';
 
-		$('body').append(ElemHtml);
-	},
+        $('body').append(ElemHtml);
+    },
 
-	addCustomButtons : function()
-	{
-		var self = this;
-		var condition = true;
+    addCustomButtons: function () {
+        var self = this;
+        var condition = true;
 
-		$('.modal-custom-button').remove();
+        $('.modal-custom-button').remove();
 
-		closeButton =  '';
+        closeButton = '';
 
-		if(typeof self.customButton != 'undefined')
-		{
-			if(Object.keys(self.customButton).length == 1)
-				closeButton =  '<button id="modal-close" type="button" class="btn btn-default modal-custom-button">Close</button>';
-		}
-		else
-		{
-			self.customButton = {
-				'Okay' : 
-				{
-					'primary' : true,
-					'callback' : function()
-					{
-						Confirm.hide();
-					}
-				}
-			};
-		}
+        if (typeof self.customButton != 'undefined') {
+            if (Object.keys(self.customButton).length == 1)
+                closeButton = '<button id="modal-close" type="button" class="btn btn-default modal-custom-button">Close</button>';
+        }
+        else {
+            self.customButton = {
+                'Okay': {
+                    'primary': true,
+                    'callback': function () {
+                        Confirm.hide();
+                    }
+                }
+            };
+        }
 
-		$.each(self.customButton, function(key, val)
-		{
-			buttonName = key.replace(/ /g, '');
+        $.each(self.customButton, function (key, val) {
+            buttonName = key.replace(/ /g, '');
 
-			var ElemHtml = '';
-			var ButtonState = 'btn-default';
+            var ElemHtml = '';
+            var ButtonState = 'btn-default';
 
-			if(val['primary'])
-				ButtonState = 'btn-primary';
-			if(buttonName.toLowerCase() == 'okay' || buttonName.toLowerCase() == 'ok')
-				closeButton = '';
+            if (val['primary'])
+                ButtonState = 'btn-primary';
+            if (buttonName.toLowerCase() == 'okay' || buttonName.toLowerCase() == 'ok')
+                closeButton = '';
 
-			if(buttonName.toLowerCase() == 'delete' || buttonName.toLowerCase() == 'remove')
-				ButtonState = 'btn-danger';
+            if (buttonName.toLowerCase() == 'delete' || buttonName.toLowerCase() == 'remove')
+                ButtonState = 'btn-danger';
 
-			ElemHtml = closeButton
-					 + '<button id="button-'+ buttonName.toLowerCase() +'" type="button" class="btn btn-danger  modal-custom-button '+ ButtonState +'">'+ buttonName +'</button>';
-					
-			$('#modal-footer').append(ElemHtml);
+            ElemHtml = closeButton
+                + '<button id="button-' + buttonName.toLowerCase() + '" type="button" class="btn btn-danger  modal-custom-button ' + ButtonState + '">' + buttonName + '</button>';
 
-			if($('#modal-close'))
-				closeButton = '';
-			
-			self.addCustomButtonEvents(buttonName.toLowerCase(), val['callback']);
-		});
+            $('#modal-footer').append(ElemHtml);
 
-		$('#modal-upper-close').unbind();
-		$('#modal-upper-close').bind('click', function(e)
-		{
-			e.preventDefault();
-			self.hide();
-		});
+            if ($('#modal-close'))
+                closeButton = '';
 
-		$('#modal-close').unbind();
-		$('#modal-close').bind('click', function(e)
-		{
-			e.preventDefault();
-			self.hide();
-		});
-	},
+            self.addCustomButtonEvents(buttonName.toLowerCase(), val['callback']);
+        });
 
-	addCustomButtonEvents : function(customButtonId, callback)
-	{
-		var self = this;
+        $('#modal-upper-close').unbind();
+        $('#modal-upper-close').bind('click', function (e) {
+            e.preventDefault();
+            self.hide();
+        });
 
-		$('#button-'+customButtonId).unbind();
-		$('#button-'+customButtonId).bind('click', function(e)
-		{
-			e.preventDefault();
-			callback();
-		});
-	},
+        $('#modal-close').unbind();
+        $('#modal-close').bind('click', function (e) {
+            e.preventDefault();
+            self.hide();
+        });
+    },
 
-	show : function(title, message, customEvent)
-	{
-		var self = this;
+    addCustomButtonEvents: function (customButtonId, callback) {
+        var self = this;
 
-		if(title)
-			$('#modal-title').html(title);
+        $('#button-' + customButtonId).unbind();
+        $('#button-' + customButtonId).bind('click', function (e) {
+            e.preventDefault();
+            callback();
+        });
+    },
 
-		if(message)
-			$('#modal-body').html(message);
+    show: function (title, message, customEvent) {
+        var self = this;
 
-		self.customButton = customEvent;
+        if (title)
+            $('#modal-title').html(title);
 
-		$(self.modalMainId).addClass('in');
-		$(self.modalBackgroundId).addClass('modal-backdrop fade in');
-		$(self.modalMainId).css({
-			'display' : 'block',
-			'padding-right' : '17px'
-		});
-		self.addCustomButtons();
-	},
+        if (message)
+            $('#modal-body').html(message);
 
-	hide : function()
-	{
-		var self = this;
+        self.customButton = customEvent;
 
-		$(self.modalMainId).removeClass('in');
-		$(self.modalBackgroundId).removeClass('modal-backdrop fade in');
+        $(self.modalBackgroundId).removeClass('fade in');
+        $(self.modalMainId).removeClass('fade in');
+        $(self.modalBackgroundId).addClass('modal-backdrop-custom');
 
-		$(self.modalMainId).css('display', 'none');
-	}
+        $(self.modalMainId).css({
+            'display': 'none',
+            'padding-right': '17px',
+        });
+        $(self.modalBackgroundId).css({
+            'display': 'none',
+        });
+        self.addCustomButtons();
+
+        $(self.modalMainId).css({
+            'opacity': '0',
+            'display': 'block',
+        });
+
+        var test = $('.modal-dialog').height();
+
+        $(self.modalMainId).attr('style', '');
+        $(self.modalMainId).css({
+            'display': 'none',
+            'padding-right': '17px',
+        });
+
+        $('.modal-dialog').css('margin-top', function () {
+            return 'calc(50% - ' + test + 'px)';
+        });
+
+
+        $(self.modalMainId).fadeIn(400, 'linear', function () {
+            // $(self.modalMainId).addClass('fade in');
+        });
+        $(self.modalBackgroundId).fadeIn(400, 'linear', function () {
+            // $(self.modalBackgroundId).addClass('in');
+        });
+    },
+
+    hide: function () {
+        var self = this;
+
+        $(self.modalMainId).fadeOut(400, 'linear', function () {
+            // $(self.modalMainId).removeClass('fade in');
+        });
+        $(self.modalBackgroundId).fadeOut(400, 'linear', function () {
+            // $(self.modalBackgroundId).removeClass('in');
+        });
+    }
 };
 
-$(document).ready(function()
-{
-	Confirm.init();
+$(document).ready(function () {
+    Confirm.init();
 });

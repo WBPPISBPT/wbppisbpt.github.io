@@ -1,8 +1,19 @@
+var pathUIDKey = "uid";
+var pathFinalContribKey = "fin_contrib";
+var pathThroughputKey = "throuput";
+var pathTotalProbabilityKey = "tot_prob";
+var pathVerticesKey = "vertices";
+var vertexObjNameKey = "obj_name";
+var vertexMatNameKey = "mat_name";
+var vertexMatTypeKey = "mat_type";
+var vertexProbKey = "prob";
+
 /**
- * Constructor for the Vote Percentage Chart
+ * Constructor for the SamplesChart
+ *
+ * @param _shiftChart
  */
 function PathsChart() {
-
     var self = this;
     self.init();
 }
@@ -10,305 +21,349 @@ function PathsChart() {
  * Initializes the svg elements required for this chart
  */
 PathsChart.prototype.init = function () {
-    // var self = this;
-    // self.margin = {top: 30, right: 20, bottom: 30, left: 50};
-    // self.divvotesPercentage = d3.select("#votes-percentage").classed("content", true);
-    //
-    // //Gets access to the div element created for this chart from HTML
-    // self.svgBounds = self.divvotesPercentage.node().getBoundingClientRect();
-    // self.svgWidth = self.svgBounds.width - self.margin.left - self.margin.right;
-    // self.svgHeight = 180;
-    //
-    // //creates svg element within the div
-    // self.svg = self.divvotesPercentage.append("svg")
-    //     .attr("width", self.svgWidth)
-    //     .attr("height", self.svgHeight)
-};
-
-PathsChart.prototype.updateWidth = function (width) {
     var self = this;
-    self.svgWidth = width - self.margin.left - self.margin.right;
-    d3.select("#votes-percentage")
-        .select("svg")
-        .attr("width", self.svgWidth);
+    self.sample;
+    self.pathsOrig;
+    self.paths;
+    self.modified = false;
+
+
+    //Gets access to the div element created for this chart from HTML
+    self.divOuter = d3.select("#paths-chart-container");
+    self.table = d3.select(".paths-table");
+    self.tableBody = d3.select(".paths-table-body");
 };
 
-/**
- * Returns the class that needs to be assigned to an element.
- *
- * @param party an ID for the party that is being referred to.
- */
-PathsChart.prototype.chooseClass = function (party) {
 
-    if (party == "R") {
-        return "republican";
-    }
-    else if (party == "D") {
-        return "democrat";
-    }
-    else if (party == "I") {
-        return "independent";
-    }
-};
-
-/**
- * Renders the HTML content for tool tip
- *
- * @param tooltip_data information that needs to be populate in the tool tip
- * @return text HTML content for toop tip
- */
-PathsChart.prototype.tooltip_render = function (tooltip_data) {
+PathsChart.prototype.getData = function (_sample) {
     var self = this;
-    var text = "<ul>";
-    tooltip_data.result.forEach(function (row) {
-        if (row.nominee != " ")
-            text += "<li class = " + self.chooseClass(row.party) + ">" + row.nominee + ":\t\t" + row.votecount + "(" + row.percentage + "%)" + "</li>"
-    });
+    if (self.sample == undefined || self.sample[sampleUIDKey] != _sample[sampleUIDKey] ) {
 
-    return text;
+        self.sample = _sample;
+        self.modified = false;
+
+        // Get the paths data and update the chart
+        if (demo) {
+            var string;
+            Math.random() > 0.5 ? string = "data/paths.json" : string = "data/paths2.json";
+            d3.json(string, function (error, _paths) {
+                $('#paths-chart-container').show();
+                self.pathsOrig = _paths['paths'];
+                // self.pixelInfo();
+                self.update();
+            });
+        }
+        else {
+            d3.json("REQUEST_PORTAL", function (error, _paths) {
+                self.pathsOrig = _paths['paths'];
+                // self.pixelInfo();
+                self.update();
+            });
+        }
+    }
 };
 
-/**
- * Creates the stacked bar chart, text content and tool tips for Vote Percentage chart
- *
- * @param electionResult election data for the year selected
- */
-PathsChart.prototype.update = function (electionResult) {
+PathsChart.prototype.update = function () {
     var self = this;
 
-    var tooltip_data = {
-        "result": [
-            {
-                "nominee": electionResult[0].D_Nominee_prop,
-                "votecount": electionResult[0].D_Votes_Total,
-                "percentage": electionResult[0].D_PopularPercentage,
-                "party": "D"
-            },
-            {
-                "nominee": electionResult[0].R_Nominee_prop,
-                "votecount": electionResult[0].R_Votes_Total,
-                "percentage": electionResult[0].R_PopularPercentage,
-                "party": "R"
-            },
-            {
-                "nominee": electionResult[0].I_Nominee_prop,
-                "votecount": electionResult[0].I_Votes_Total,
-                "percentage": electionResult[0].I_PopularPercentage,
-                "party": "I"
-            }
-        ]
-    };
+    if (!self.modified)
+        self.paths = self.pathsOrig.slice(0);
 
-    var tip = d3.tip().attr('class', 'd3-tip-pop')
-        .direction('s')
-        .offset(function () {
-            return [0, 0];
-        })
-        .html(function () {
-            return self.tooltip_render(tooltip_data);
+    var trMain = self.tableBody.selectAll('.path-tr-main')
+        .data(self.paths);
+
+    var trMainEnter = trMain.enter()
+        .append('tr')
+        .attr('class', 'path-tr-main');
+
+    trMain.exit().remove();
+    trMain = trMain.merge(trMainEnter);
+
+    var tdMain = trMain.selectAll('.path-td-main')
+        .data(function (d) {
+            return [
+                {'vis': 'show-detail', 'value': d[pathUIDKey]},
+                {'vis': 'uid', 'value': d[pathUIDKey]},
+                {'vis': 'fin-contrib', 'value': d[pathFinalContribKey]},
+                {'vis': 'throughput', 'value': d[pathThroughputKey]},
+                {'vis': 'tot-prob', 'value': d[pathTotalProbabilityKey]},
+                {'vis': 'edge-count', 'value': d[pathVerticesKey].length},
+                {'vis': 'tp-d-tp', 'value': d[pathThroughputKey] / d[pathTotalProbabilityKey]},
+                {'vis': 'vertices', 'value': d[pathVerticesKey]}
+            ];
         });
 
-    self.svg.call(tip);
+    var tdMainEnter = tdMain.enter()
+        .append('td')
+        .attr("class", function (d) {
+            return 'path-td-main td-' + d.vis;
+        });
 
-    var final = [
-        parseFloat(electionResult[0].I_PopularPercentage) || 0,
-        parseFloat(electionResult[0].D_PopularPercentage) || 0,
-        parseFloat(electionResult[0].R_PopularPercentage) || 0
-    ];
+    tdMain.exit().remove();
+    tdMain = tdMain.merge(tdMainEnter);
 
-    var total = final[0] + final[1] + final[2];
+    console.log(tdMain.data().length);
 
-    var xScale = d3.scaleLinear()
-        .domain([0, 100])
-        .range([0, self.svgWidth]);
 
-    var bars = self.svg.selectAll("rect")
-        .data(final);
+    var finContribData = tdMain.filter(function (d) {
+        return d.vis == 'fin-contrib';
+    });
 
-    bars.exit().remove();
+    var temp = d3.selectAll('.td-fin-contrib');
+    var finContrib = d3.selectAll('.td-fin-contrib')
+        .data(finContribData.data());
+
+    console.log(tdMain.data().length);
+
+    var finContribEnter = finContrib.enter();
+        // .append('p');
+
+    finContrib.exit().remove();
+    finContrib = finContrib.merge(finContribEnter);
+
+    finContrib.text(function (d) {
+            return d.value;
+        });
+
+};
+
+
+PathsChart.prototype.setupAxis = function (param) {
+    var self = this;
+
+    var className;
+    var axisFunction;
+    param == 'y' ? className = 'y-axis' : className = 'x-axis';
+
+    var xAxisScale = d3.scaleLinear()
+        .range([0, self.svgWidth - self.axisWidth - 3]);
+
+    if (param == 'y') {
+        axisFunction = d3.axisLeft();
+        axisFunction.scale(self.yScale);
+    }
+    else {
+        axisFunction = d3.axisBottom();
+        axisFunction.scale(xAxisScale);
+        axisFunction.ticks(0);
+        axisFunction.tickSize(0);
+    }
+
+    var axis = self.chartSVG.selectAll('.' + className)
+        .data([1]);
+
+    axis.exit().remove();
+
+    var axisEnter = axis.enter()
+        .append("g")
+        .attr("class", className);
+
+    axis = axis.merge(axisEnter);
+
+    axis.call(axisFunction)
+        .attr("transform", function () {
+            if (param == 'y') {
+                return "translate(" + self.axisWidth + ", 10)";
+            }
+            else {
+                var translate = "translate(";
+                translate += self.axisWidth;
+                translate += ", ";
+                translate += (self.svgHeight - self.yScale(self.maxFinContrib) - 10);
+                translate += ")";
+                return translate;
+            }
+        });
+};
+
+PathsChart.prototype.setupBars = function () {
+    var self = this;
+    var bars = self.chartSVG.selectAll('.bar')
+        .data(self.paths);
+
+    bars.exit().remove()
+        .attr('fill', function (d) {
+            return self.colorScale(d[sampleFinalContribKey]);
+        });
 
     var barsEnter = bars.enter()
-        .append("rect");
+        .append('rect')
+        .classed('bar', true);
 
     bars = bars.merge(barsEnter);
 
-    var lastStart = 0;
+    var barWidth = (self.svgWidth - self.axisWidth) / self.paths.length;
 
-    bars.attr("y", 70)
-        .attr("height", 20)
-        .attr("width", function (d) {
-            var currentWidth = xScale(d * 100 / total);
-            d3.select(this).attr("x", function () {
-                return lastStart;
-            });
-            lastStart += currentWidth + 1;
-            return currentWidth;
+    bars
+        .attr("x", function (d) {
+            return self.xScale(d[sampleUIDKey]);
         })
-        .classed("electoralVotes", true)
-        .attr("class", function (d, i) {
-            if (i == 0)
-                return self.chooseClass("I");
-            else if (i == 1)
-                return self.chooseClass("D");
-            else
-                return self.chooseClass("R");
+        .attr("y", function (d) {
+            return self.yScale(d[sampleFinalContribKey]) + 10;
         })
-        .on('mouseover', function () {
-            tip.show();
-            var coordinates = [d3.event.x, d3.event.y];
-            d3.selectAll(".d3-tip-pop")
-                .style("left", (coordinates[0] + 20) + "px");
+        .attr("width", barWidth - 2)
+        .attr("height", function (d) {
+            return self.svgHeight - self.yScale(d[sampleFinalContribKey]) - 20;
         })
-        .on('mousemove', function () {
-            var coordinates = [d3.event.x, d3.event.y];
-            d3.selectAll(".d3-tip-pop")
-                .style("left", (coordinates[0] + 20) + "px");
+        .attr('style', 'cursor: pointer;')
+        .attr('fill', function (d) {
+            return self.colorScale(d[sampleFinalContribKey]);
         })
-        .on('mouseout', tip.hide);
-
-    var text = self.svg.selectAll(".votesPercentageText")
-        .data(final);
-
-    text.exit().remove();
-
-    var textEnter = text.enter()
-        .append("text");
-
-    text = text.merge(textEnter);
-
-    text.text(function (d) {
-        return d;
-    })
-        .attr("opacity", function (d) {
-            if (d == 0)
-                return 0;
-            else
-                return 1;
-        })
-        .attr("y", 60)
-        .attr("x", function (d, i) {
-            if (i == 0)
-                return 0;
-            else if (i == 1)
-                return xScale(final[0] * 100 / total);
-            else
-                return self.svgWidth;
-        })
-        .attr("class", function (d, i) {
-            if (i == 0)
-                return self.chooseClass("I");
-            else if (i == 1)
-                return self.chooseClass("D");
-            else
-                return self.chooseClass("R");
-        })
-        .classed("votesPercentageText", true);
-
-    var nominees = [electionResult[0].I_Nominee_prop, electionResult[0].D_Nominee_prop, electionResult[0].R_Nominee_prop];
-
-    var nominee = self.svg.selectAll(".votesPercentageNominee")
-        .data(nominees);
-
-    nominee.exit().remove();
-
-    var nomineeEnter = nominee.enter()
-        .append("text");
-
-    nominee = nominee.merge(nomineeEnter);
-
-    nominee.text(function (d) {
-        return d;
-    })
-        .attr("opacity", function (d) {
-            if (d == 0)
-                return 0;
-            else
-                return 1;
-        })
-        .attr("y", 25)
-        .attr("x", function (d, i) {
-            if (i == 0)
-                return 0;
-            else if (i == 1) {
-                if (nominees[0] == 0) {
-                    d3.select(this).style("text-anchor", "start");
-                    return 0;
-                }
-                else {
-                    d3.select(this).style("text-anchor", "middle");
-                    return xScale(50);
-                }
+        .on('contextmenu', function (d, i) {
+            if (self.paths.length > 1) {
+                self.modifyData('r', i);
+                self.recordRemovedPixel(d);
             }
-            else
-                return self.svgWidth;
-        })
-        .attr("class", function (d, i) {
-            if (i == 0)
-                return self.chooseClass("I");
-            else if (i == 1)
-                return self.chooseClass("D");
-            else
-                return self.chooseClass("R");
-        })
-        .classed("votesPercentageNominee", true);
-
-    var line = self.svg.selectAll(".ev-line")
-        .data([1]);
-
-    line.exit().remove();
-
-    var lineEnter = line.enter()
-        .append("path");
-
-    line = line.merge(lineEnter);
-    line.attr("class", "ev-line ")
-        .attr("d", function () {
-            return "M  " + self.svgWidth / 2 + " 60 L " + self.svgWidth / 2 + " 100";
-        })
-        .attr("x", 0)
-        .attr("y", 0);
-
-    var infoText = self.svg.selectAll(".ev-text")
-        .data([1]);
-
-    infoText.exit().remove();
-
-    var infoTextEnter = infoText.enter()
-        .append("text");
-
-    infoText = infoText.merge(infoTextEnter);
-
-    infoText.text("Popular Vote in Percentage [50%]")
-        .attr("y", 50)
-        .attr("x", self.svgWidth / 2)
-        .attr("class", "ev-text")
-        .attr('transform', function () {
-            var bounds = d3.select(this).node().getBoundingClientRect();
-            var width = bounds.width;
-
-            return "translate(" + (width / -2) + ", 0)";
+            return false;
         });
+};
+PathsChart.prototype.setupMean = function () {
+    var self = this;
 
-    // ******* TODO: PART III *******
+    var mean = d3.mean(self.paths, function (d) {
+        return +d[sampleFinalContribKey];
+    });
 
-    //Create the stacked bar chart.
-    //Use the global color scale to color code the rectangles.
-    //HINT: Use .votesPercentage class to style your bars.
 
-    //Display the total percentage of votes won by each party
-    //on top of the corresponding groups of bars.
-    //HINT: Use the .votesPercentageText class to style your text elements;  Use this in combination with
-    // chooseClass to get a color based on the party wherever necessary
+    d3.select('.mean').remove();
+    d3.select('.meanText').remove();
+    console.log(mean);
 
-    //Display a bar with minimal width in the center of the bar chart to indicate the 50% mark
-    //HINT: Use .middlePoint class to style this bar.
+    var meanBar = self.chartSVG.selectAll('.mean')
+        .data([mean]);
 
-    //Just above this, display the text mentioning details about this mark on top of this bar
-    //HINT: Use .votesPercentageNote class to style this text element
+    var meanText = self.chartSVG.selectAll('.meanText')
+        .data([mean]);
 
-    //Call the tool tip on hover over the bars to display stateName, count of electoral votes.
-    //then, vote percentage and number of votes won by each party.
+    var meanBarWidth = (self.svgWidth - self.axisWidth);
 
-    //HINT: Use the chooseClass method to style your elements based on party wherever necessary.
+    meanBar.enter()
+        .append('rect')
+        .classed('mean', true)
+        .attr("x", function (d) {
+            return self.axisWidth;
+        })
+        .attr("y", function (d) {
+            return self.yScale(d) + 10;
+        })
+        .attr("width", meanBarWidth - 2)
+        .attr("height", function (d) {
+            return 1;
+        })
+        .attr('fill', 'rgba(0, 0, 0, 0.8)');
 
+    var format = d3.format(".02f");
+
+    meanText.enter()
+        .append('text')
+        .classed('meanText', true)
+        .attr("x", function (d) {
+            return self.axisWidth + 5;
+        })
+        .attr("y", function (d) {
+            return self.yScale(d) + 10;
+        })
+        .text(function (d) {
+            return 'Samples Mean: ' + format(d);
+        })
+        .attr("font-family", "sans-serif")
+        .attr("font-size", "1em")
+        .attr("font-weight", "bold")
+        .attr("alignment-baseline", function (d) {
+            if (d == self.maxFinContrib) {
+                return 'before-edge';
+            }
+            return 'after-edge';
+        })
+        .attr('fill', 'rgba(0, 0, 0, 0.8)');
+};
+
+PathsChart.prototype.recordRemovedPixel = function (d) {
+    var self = this;
+    var pixel = self.sample.x + '-' + self.sample.y;
+    if (!removedSamples[pixel]) {
+        removedSamples[pixel] = {};
+    }
+    removedSamples[pixel][d[sampleUIDKey]] = d;
+};
+
+PathsChart.prototype.pixelInfo = function () {
+    var self = this;
+
+    function hex(x) {
+        return ("0" + parseInt(x).toString(16)).slice(-2);
+    }
+
+    function hexToRgb(hex) {
+        var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+        return result ? {
+            r: parseInt(result[1], 16),
+            g: parseInt(result[2], 16),
+            b: parseInt(result[3], 16)
+        } : null;
+    }
+
+    function color(x) {
+        var mid = 255 / 2;
+        if (x.r) {
+            if (x.r >= mid && x.g >= mid && x.b >= mid)
+                return 'black';
+            else
+                return 'white';
+        }
+        else
+            return 'white';
+    }
+
+    $('#pixelX').text('X: ' + self.sample.x);
+    $('#pixelY').text('Y: ' + self.sample.y);
+
+    var pixelColor = "#" + hex(self.sample.colorR) + hex(self.sample.colorG) + hex(self.sample.colorB);
+
+    $('#pixelCol').css("background", pixelColor);
+    $('#pixelCol').css("color", color(hexToRgb(pixelColor)));
+    $('#pixelCol').text(pixelColor.toUpperCase());
+
+    $('#pixelRed').css("background", "rgba(" + self.sample.colorR + ", 0, 0, 1)");
+    $('#pixelRed').text('R:' + self.sample.colorR);
+    $('#pixelRed').css("color", color(self.sample.colorR));
+
+    $('#pixelGreen').css("background", "rgba(0," + self.sample.colorG + ", 0, 1)");
+    $('#pixelGreen').text('G:' + self.sample.colorG);
+    $('#pixelGreen').css("color", color(self.sample.colorG));
+
+    $('#pixelBlue').css("background", "rgba(0, 0," + self.sample.colorB + ", 1)");
+    $('#pixelBlue').text('B:' + self.sample.colorB);
+    $('#pixelBlue').css("color", color(self.sample.colorB));
+};
+
+PathsChart.prototype.modifyData = function (param, index) {
+    // sr: sort reset
+    // sa: sort ascending
+    // sd: sort descending
+    // r: remove element
+    var self = this;
+    switch (param) {
+        case 'sr':
+            self.modified = false;
+            self.paths = self.pathsOrig.slice(0);
+            break;
+        case 'sa':
+            self.modified = true;
+            self.paths = self.paths.sort(function (a, b) {
+                return d3.ascending(a[sampleFinalContribKey], b[sampleFinalContribKey]);
+            });
+            break;
+        case 'sd':
+            self.modified = true;
+            self.paths = self.paths.sort(function (a, b) {
+                return d3.descending(a[sampleFinalContribKey], b[sampleFinalContribKey]);
+            });
+            break;
+        case 'r':
+            self.modified = true;
+            self.paths.splice(index, 1);
+            break;
+    }
+    self.update();
 };
