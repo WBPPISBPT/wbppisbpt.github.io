@@ -1,3 +1,6 @@
+var database_URI = "http://localhost:8000";
+
+
 var demo = true;
 var isFrozen = false;
 var removedSamples = {};
@@ -39,25 +42,94 @@ var removedSamples = {};
     //     }
     // });
 
+    function UpdateRenderCanvas (data) {
+        let canvas = d3.select('#renderCanvas');
+        console.log(data);
+
+        canvas.attr('width', data.width);
+        canvas.attr('height', data.height);
+
+        let context = canvas.node().getContext("2d");
+
+        let imgData = context.createImageData(data.width, data.height);
+
+        let imgSize = data.width*data.height;
+
+        for (var i=0; i<imgSize; i++) {
+            imgData.data[4*i+0] = data.data_r[i] * 255;
+            imgData.data[4*i+1] = data.data_g[i] * 255;
+            imgData.data[4*i+2] = data.data_b[i] * 255;
+            imgData.data[4*i+3] = 255;
+        }
+
+        //console.log(imgData)
+
+        context.putImageData(imgData,0,0);
+    }
+
+    function GetRenderIteration(iteration) {
+        var query = {
+            "renderIteration": iteration
+        };
+
+        var send_data = {
+            "query_string": JSON.stringify(query)
+        };
+
+        $.ajax({
+            type: "GET"
+                //type: "POST"
+                //crossDomain : true,
+                //cache: false,
+                //url: database_URI + '/getFromCollection/Cameras',
+                ,
+            url: database_URI + '/getFromCollection/ImageIterations'
+                //data: data,
+                ,
+            success: function (data, textStatus, jqXHR) {
+                //console.log(textStatus);
+                //console.log(data);
+                UpdateRenderCanvas(data[0]);
+            },
+            error: function (jqXHR, textStatus, errorThrown) {
+                console.log(textStatus);
+                console.log(jqXHR);
+                console.log(errorThrown);
+            }
+
+            // The query.
+            //, data: query
+
+            ,
+            data: send_data
+
+            //, dataType: "json"
+            //dataType: dataType
+        });
+    }
 
     /**
      * Creates instances for image analyzer and every chart;
      * the classes are defined in the respective javascript files.
      */
     function init() {
+
+        GetRenderIteration(1);
+
+
+
         //Creating instances for each visualization
         var pathsChart = new PathsChart();
         var samplesChart = new SamplesChart(pathsChart);
 
 
         // Get the render gallery and load the image analyzer
-        if (demo){
+        if (demo) {
             d3.json("data/renders.json", function (error, renders) {
                 var imageAnalyzer = new ImageAnalyzer(samplesChart, pathsChart, renders);
                 imageAnalyzer.update();
             });
-        }
-        else {
+        } else {
             d3.json("REQUESTP_ORTAL", function (error, renders) {
                 var imageAnalyzer = new ImageAnalyzer(samplesChart, pathsChart, renders);
                 imageAnalyzer.update();
@@ -93,4 +165,3 @@ var removedSamples = {};
 
     Main.getInstance();
 })();
-

@@ -1,3 +1,21 @@
+
+
+
+/*
+    Top-down approach:
+    
+    Image pixel values.
+    
+    For each pixel, list of sample contributions (RGB) for histogram.
+
+
+
+
+*/
+
+
+
+
 //var port = 443;
 var port = 8000;
 
