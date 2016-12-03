@@ -71,17 +71,22 @@ SamplesChart.prototype.getData = function (_pixel) {
         self.pixel = _pixel;
         self.modified = false;
 
+        console.log('SamplesChart.getData was called for pixel: ', _pixel.x, _pixel.y);
+        console.log('SamplesChart.getData trying to get samples.json');
         // Get the samples data and update the chart
         if (demo) {
             d3.json("data/samples.json", function (error, _samples) {
                 $('#samples-chart-container').show();
+                console.log('SamplesChart.getData received data: ', _samples);
                 self.samplesOrig = _samples['samples'];
                 self.pixelInfo();
                 self.update();
             });
         }
         else {
-            d3.json("REQUESTP_ORTAL", function (error, _samples) {
+            d3.json("data/samples.json", function (error, _samples) {
+                $('#samples-chart-container').show();
+                console.log('SamplesChart.getData received data: ', _samples);
                 self.samplesOrig = _samples['samples'];
                 self.pixelInfo();
                 self.update();
@@ -314,6 +319,8 @@ SamplesChart.prototype.recordRemovedPixel = function (d) {
 
 SamplesChart.prototype.updatePathsChart = function (sample) {
     var s = this;
+    console.log('SamplesChart trying to update PathsChart with the following sample object:');
+    console.log(sample);
     s.pathsChart.getData(sample);
 };
 

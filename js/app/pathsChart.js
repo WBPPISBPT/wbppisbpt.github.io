@@ -42,19 +42,24 @@ PathsChart.prototype.getData = function (_sample) {
         self.sample = _sample;
         self.modified = false;
 
+        console.log('PathsChart.getData called.');
+        console.log('SampleUID: ', _sample[sampleUIDKey]);
         // Get the paths data and update the chart
         if (demo) {
             var string;
             Math.random() > 0.5 ? string = "data/paths.json" : string = "data/paths2.json";
             d3.json(string, function (error, _paths) {
                 $('#paths-chart-container').show();
+                console.log('PathsChart.getData received data: ', _paths);
                 self.pathsOrig = _paths['paths'];
                 // self.pixelInfo();
                 self.update();
             });
         }
         else {
-            d3.json("REQUEST_PORTAL", function (error, _paths) {
+            d3.json("data/paths.json", function (error, _paths) {
+                $('#paths-chart-container').show();
+                console.log('PathsChart.getData received data: ', _paths);
                 self.pathsOrig = _paths['paths'];
                 // self.pixelInfo();
                 self.update();
@@ -102,9 +107,6 @@ PathsChart.prototype.update = function () {
     tdMain.exit().remove();
     tdMain = tdMain.merge(tdMainEnter);
 
-    console.log(tdMain.data().length);
-
-
     var finContribData = tdMain.filter(function (d) {
         return d.vis == 'fin-contrib';
     });
@@ -112,8 +114,6 @@ PathsChart.prototype.update = function () {
     var temp = d3.selectAll('.td-fin-contrib');
     var finContrib = d3.selectAll('.td-fin-contrib')
         .data(finContribData.data());
-
-    console.log(tdMain.data().length);
 
     var finContribEnter = finContrib.enter();
         // .append('p');

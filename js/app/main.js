@@ -1,7 +1,7 @@
 var database_URI = "http://localhost:8000";
 
 
-var demo = true;
+var demo = false;
 var isFrozen = false;
 var removedSamples = {};
 
@@ -64,7 +64,9 @@ var removedSamples = {};
 
         //console.log(imgData)
 
-        context.putImageData(imgData,0,0);
+//         context.putImageData(imgData,0,0);
+//         console.log($('#renderCanvas'));
+//         $('#render-image').attr('src', document.getElementById('renderCanvas').toDataURL('image/jpeg'));
     }
 
     function GetRenderIteration(iteration) {
@@ -122,7 +124,7 @@ var removedSamples = {};
         var pathsChart = new PathsChart();
         var samplesChart = new SamplesChart(pathsChart);
 
-
+        console.log('Requested the GALLERY json.')
         // Get the render gallery and load the image analyzer
         if (demo) {
             d3.json("data/renders.json", function (error, renders) {
@@ -130,7 +132,7 @@ var removedSamples = {};
                 imageAnalyzer.update();
             });
         } else {
-            d3.json("REQUESTP_ORTAL", function (error, renders) {
+            d3.json("data/renders.json", function (error, renders) {
                 var imageAnalyzer = new ImageAnalyzer(samplesChart, pathsChart, renders);
                 imageAnalyzer.update();
             });

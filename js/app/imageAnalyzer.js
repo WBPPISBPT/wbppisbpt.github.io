@@ -611,5 +611,7 @@ ImageAnalyzer.prototype.drawFireflyIndicators = function (s) {
 
 ImageAnalyzer.prototype.updateSamplesChart = function (pixel) {
     var s = this;
+    console.log('User selected pixel: ', pixel.x, pixel.y);
+    console.log('Sending pixel identity to samplesChart');
     s.samplesChart.getData(pixel);
 };
