@@ -42,7 +42,7 @@ var removedSamples = {};
     //     }
     // });
 
-    function UpdateRenderCanvas (data) {
+    function UpdateRenderCanvas(data) {
         let canvas = d3.select('#renderCanvas');
         console.log(data);
 
@@ -53,20 +53,68 @@ var removedSamples = {};
 
         let imgData = context.createImageData(data.width, data.height);
 
-        let imgSize = data.width*data.height;
+        let imgSize = data.width * data.height;
 
-        for (var i=0; i<imgSize; i++) {
-            imgData.data[4*i+0] = data.data_r[i] * 255;
-            imgData.data[4*i+1] = data.data_g[i] * 255;
-            imgData.data[4*i+2] = data.data_b[i] * 255;
-            imgData.data[4*i+3] = 255;
+        for (var i = 0; i < imgSize; i++) {
+            imgData.data[4 * i + 0] = data.data_r[i] * 255;
+            imgData.data[4 * i + 1] = data.data_g[i] * 255;
+            imgData.data[4 * i + 2] = data.data_b[i] * 255;
+            imgData.data[4 * i + 3] = 255;
         }
 
         //console.log(imgData)
 
-//         context.putImageData(imgData,0,0);
-//         console.log($('#renderCanvas'));
-//         $('#render-image').attr('src', document.getElementById('renderCanvas').toDataURL('image/jpeg'));
+        context.putImageData(imgData, 0, 0);
+        //         console.log($('#renderCanvas'));
+        //         $('#render-image').attr('src', document.getElementById('renderCanvas').toDataURL('image/jpeg'));
+    }
+
+    function GetPixelSampleValue(i, j) {
+        let results = [];
+
+        var query = {
+            "pixel_i": i,
+            "pixel_j": j
+        };
+
+        var send_data = {
+            "query_string": JSON.stringify(query)
+        };
+
+        $.ajax({
+            type: "GET"
+                //type: "POST"
+                //crossDomain : true,
+                //cache: false,
+                //url: database_URI + '/getFromCollection/Cameras',
+                ,
+            url: database_URI + '/getFromCollection/OriginalCameraPaths'
+                //data: data,
+                ,
+            success: function (data, textStatus, jqXHR) {
+                console.log(textStatus)
+                console.log(data)
+
+
+
+            },
+            error: function (jqXHR, textStatus, errorThrown) {
+                console.log(textStatus);
+                console.log(jqXHR);
+                console.log(errorThrown);
+            }
+
+            // The query.
+            //, data: query
+
+            ,
+            data: send_data
+
+            //, dataType: "json"
+            //dataType: dataType
+        });
+
+
     }
 
     function GetRenderIteration(iteration) {
@@ -116,7 +164,7 @@ var removedSamples = {};
      */
     function init() {
 
-        GetRenderIteration(1);
+        GetRenderIteration(4);
 
 
 
@@ -125,7 +173,7 @@ var removedSamples = {};
         var samplesChart = new SamplesChart(pathsChart);
 
         console.log('Requested the GALLERY json.')
-        // Get the render gallery and load the image analyzer
+            // Get the render gallery and load the image analyzer
         if (demo) {
             d3.json("data/renders.json", function (error, renders) {
                 var imageAnalyzer = new ImageAnalyzer(samplesChart, pathsChart, renders);

@@ -72,7 +72,7 @@ SamplesChart.prototype.getData = function (_pixel) {
         self.modified = false;
 
         console.log('SamplesChart.getData was called for pixel: ', _pixel.x, _pixel.y);
-        console.log('SamplesChart.getData trying to get samples.json');
+        //console.log('SamplesChart.getData trying to get samples.json');
         // Get the samples data and update the chart
         if (demo) {
             d3.json("data/samples.json", function (error, _samples) {
@@ -82,14 +82,53 @@ SamplesChart.prototype.getData = function (_pixel) {
                 self.pixelInfo();
                 self.update();
             });
-        }
-        else {
-            d3.json("data/samples.json", function (error, _samples) {
-                $('#samples-chart-container').show();
-                console.log('SamplesChart.getData received data: ', _samples);
-                self.samplesOrig = _samples['samples'];
-                self.pixelInfo();
-                self.update();
+        } else {
+            let query = {
+                "pixel_i": _pixel.x,
+                "pixel_j": _pixel.y
+            };
+
+            let send_data = {
+                "query_string": JSON.stringify(query)
+            };
+
+            $.ajax({
+                type: "GET"
+                    ,
+                url: database_URI + '/getFromCollection/Samples'
+                    ,
+                success: function (data, textStatus, jqXHR) {
+                    console.log(textStatus)
+                    console.log("Got pixel sample values");
+                    console.log(data)
+                    
+                    results = [];
+                    data.forEach(function(d){
+                        results.push({
+                            fin_contrib: Math.sqrt(d.value.r*d.value.r + d.value.g*d.value.g + d.value.b*d.value.b),
+                            uid: d.uid,
+                            r: d.value.r,
+                            g: d.value.g,
+                            b: d.value.b
+                        });
+                    });
+
+                    console.log("Pixel samples")
+                    console.log(results)
+
+                    self.samplesOrig = results;
+                    $('#samples-chart-container').show();
+                    self.pixelInfo();
+                    self.update();
+                }
+                    ,
+                error: function (jqXHR, textStatus, errorThrown) {
+                    console.log(textStatus);
+                    console.log(jqXHR);
+                    console.log(errorThrown);
+                }
+                    ,
+                data: send_data
             });
         }
     }
@@ -170,8 +209,7 @@ SamplesChart.prototype.setupAxis = function (param) {
     if (param == 'y') {
         axisFunction = d3.axisLeft();
         axisFunction.scale(self.yScale);
-    }
-    else {
+    } else {
         axisFunction = d3.axisBottom();
         axisFunction.scale(xAxisScale);
         axisFunction.ticks(0);
@@ -193,8 +231,7 @@ SamplesChart.prototype.setupAxis = function (param) {
         .attr("transform", function () {
             if (param == 'y') {
                 return "translate(" + self.axisWidth + ", 10)";
-            }
-            else {
+            } else {
                 var translate = "translate(";
                 translate += self.axisWidth;
                 translate += ", ";
@@ -242,7 +279,7 @@ SamplesChart.prototype.setupBars = function () {
             self.updatePathsChart(d);
         })
         .on('contextmenu', function (d, i) {
-            if (self.samples.length > 1){
+            if (self.samples.length > 1) {
                 self.modifyData('r', i);
                 self.recordRemovedPixel(d);
             }
@@ -347,8 +384,7 @@ SamplesChart.prototype.pixelInfo = function () {
                 return 'black';
             else
                 return 'white';
-        }
-        else
+        } else
             return 'white';
     }
 

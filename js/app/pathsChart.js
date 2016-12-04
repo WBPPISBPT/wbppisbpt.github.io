@@ -57,12 +57,54 @@ PathsChart.prototype.getData = function (_sample) {
             });
         }
         else {
-            d3.json("data/paths.json", function (error, _paths) {
-                $('#paths-chart-container').show();
-                console.log('PathsChart.getData received data: ', _paths);
-                self.pathsOrig = _paths['paths'];
-                // self.pixelInfo();
-                self.update();
+
+            let query = {
+                "sampleID": _sample[sampleUIDKey]
+            };
+
+            let send_data = {
+                "query_string": JSON.stringify(query)
+            };
+
+            $.ajax({
+                type: "GET"
+                    ,
+                url: database_URI + '/getFromCollection/SamplePaths'
+                    ,
+                success: function (data, textStatus, jqXHR) {
+                    console.log(textStatus)
+                    console.log("Got sample paths for ID", _sample[sampleUIDKey]);
+                    console.log(data);
+
+                    $('#paths-chart-container').show();
+                    self.pathsOrig = data;
+                    self.update();
+                    
+                    /*
+                    results = [];
+                    data.forEach(function(d){
+                        results.push({
+                            fin_contrib: Math.sqrt(d.value.r*d.value.r + d.value.g*d.value.g + d.value.b*d.value.b),
+                            uid: d.uid,
+                            r: d.value.r,
+                            g: d.value.g,
+                            b: d.value.b
+                        });
+                    });
+
+                    console.log("Samples results")
+                    console.log(results)
+
+                    */
+                }
+                    ,
+                error: function (jqXHR, textStatus, errorThrown) {
+                    console.log(textStatus);
+                    console.log(jqXHR);
+                    console.log(errorThrown);
+                }
+                    ,
+                data: send_data
             });
         }
     }
@@ -84,13 +126,20 @@ PathsChart.prototype.update = function () {
     trMain.exit().remove();
     trMain = trMain.merge(trMainEnter);
 
+
+
+
+
+   // return;
+
+
     var tdMain = trMain.selectAll('.path-td-main')
         .data(function (d) {
             return [
                 {'vis': 'show-detail', 'value': d[pathUIDKey]},
                 {'vis': 'uid', 'value': d[pathUIDKey]},
                 {'vis': 'fin-contrib', 'value': d[pathFinalContribKey]},
-                {'vis': 'throughput', 'value': d[pathThroughputKey]},
+                //{'vis': 'throughput', 'value': d[pathThroughputKey]},
                 {'vis': 'tot-prob', 'value': d[pathTotalProbabilityKey]},
                 {'vis': 'edge-count', 'value': d[pathVerticesKey].length},
                 {'vis': 'tp-d-tp', 'value': d[pathThroughputKey] / d[pathTotalProbabilityKey]},
