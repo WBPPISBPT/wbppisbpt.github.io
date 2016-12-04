@@ -141,14 +141,39 @@ PathsChart.prototype.update = function () {
 
     var tdMain = trMain.selectAll('.path-td-main')
         .data(function (d) {
+
+            let val = d.value;
+            let fin_Contr = Math.sqrt(val.r*val.r + val.g*val.g + val.b*val.b);
+
+
+            if (d.sampleType == 'VC') {
+
+                return [
+                {'vis': 'type', 'value' : d.sampleType},
+                {'vis': 'show-detail', 'value': d[pathUIDKey]},
+                {'vis': 'uid', 'value': d[pathUIDKey]},
+                {'vis': 'fin-contrib', 'value': fin_Contr},
+                //,
+                //{'vis': 'throughput', 'value': d[pathThroughputKey]},
+                //{'vis': 'tot-prob', 'value': d[pathTotalProbabilityKey]},
+                //{'vis': 'edge-count', 'value': d[pathVerticesKey].length},
+                //{'vis': 'tp-d-tp', 'value': d[pathThroughputKey] / d[pathTotalProbabilityKey]},
+                {'vis': 'cameraVertices', 'value': d.cameraVertices},
+                {'vis': 'lightVertices', 'value': d.lightVertices}
+            ];
+
+
+            }
+
             return [
                 {'vis': 'show-detail', 'value': d[pathUIDKey]},
                 {'vis': 'uid', 'value': d[pathUIDKey]},
-                {'vis': 'fin-contrib', 'value': d[pathFinalContribKey]},
+                {'vis': 'fin-contrib', 'value': fin_Contr},
+                //,
                 //{'vis': 'throughput', 'value': d[pathThroughputKey]},
-                {'vis': 'tot-prob', 'value': d[pathTotalProbabilityKey]},
-                {'vis': 'edge-count', 'value': d[pathVerticesKey].length},
-                {'vis': 'tp-d-tp', 'value': d[pathThroughputKey] / d[pathTotalProbabilityKey]},
+                //{'vis': 'tot-prob', 'value': d[pathTotalProbabilityKey]},
+                //{'vis': 'edge-count', 'value': d[pathVerticesKey].length},
+                //{'vis': 'tp-d-tp', 'value': d[pathThroughputKey] / d[pathTotalProbabilityKey]},
                 {'vis': 'vertices', 'value': d[pathVerticesKey]}
             ];
         });

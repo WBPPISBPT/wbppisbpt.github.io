@@ -156,7 +156,7 @@ SamplesChart.prototype.update = function () {
     });
 
     self.yScale = d3.scaleLinear()
-        .range([self.svgHeight - 20, 0])
+        .range([self.svgHeight - 10, 10])
         .domain([0, self.maxFinContrib]);
 
     self.xScale = d3.scaleBand()
@@ -211,7 +211,7 @@ SamplesChart.prototype.setupAxis = function (param) {
     param == 'y' ? className = 'y-axis' : className = 'x-axis';
 
     var xAxisScale = d3.scaleLinear()
-        .range([0, self.svgWidth - self.axisWidth - 3]);
+        .range([5, self.svgWidth - self.axisWidth - 3]);
 
     if (param == 'y') {
         axisFunction = d3.axisLeft();
@@ -272,11 +272,11 @@ SamplesChart.prototype.setupBars = function () {
             return self.xScale(d[sampleUIDKey]);
         })
         .attr("y", function (d) {
-            return self.yScale(d[sampleFinalContribKey]) + 10;
+            return self.yScale(d[sampleFinalContribKey]) - 10;
         })
         .attr("width", barWidth - 2)
         .attr("height", function (d) {
-            return self.svgHeight - self.yScale(d[sampleFinalContribKey]) - 20;
+            return self.svgHeight - self.yScale(d[sampleFinalContribKey]);
         })
         .attr('style', 'cursor: pointer;')
         .attr('fill', function (d) {
