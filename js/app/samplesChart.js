@@ -83,6 +83,13 @@ SamplesChart.prototype.getData = function (_pixel) {
                 self.update();
             });
         } else {
+            self.pixelInfo();
+
+            $('#samples-chart-container').show();
+            $('.wait1').show();
+
+            //return;
+
             let query = {
                 "pixel_i": _pixel.x,
                 "pixel_j": _pixel.y
@@ -117,8 +124,8 @@ SamplesChart.prototype.getData = function (_pixel) {
                     console.log(results)
 
                     self.samplesOrig = results;
-                    $('#samples-chart-container').show();
-                    self.pixelInfo();
+                    $('.wait1').hide();
+               
                     self.update();
                 }
                     ,

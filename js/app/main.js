@@ -1,5 +1,5 @@
-//var database_URI = "http://localhost:8000";
 
+//var database_URI = "http://localhost:8000";
 var database_URI = "http://cs6630.sci.utah.edu:8000";
 
 
@@ -166,7 +166,7 @@ var removedSamples = {};
      */
     function init() {
 
-        //GetRenderIteration(4);
+        //GetRenderIteration(2);
 
 
 

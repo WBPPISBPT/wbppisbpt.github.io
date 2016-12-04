@@ -310,11 +310,43 @@ table, td, th {
 }
 
 .modal-backdrop-custom {
-    position: fixed;
+    position: relative;
     top: 0;
     right: 0;
     bottom: 0;
     left: 0;
     z-index: 1040;
     background-color: rgba(0,0,0,.5);
+}
+
+.invisible {
+    visibility: hidden;
+    display: none;
+}
+
+/* http://smallenvelop.com/display-loading-icon-page-loads-completely */
+
+/* Paste this css to your style sheet file or under head tag */
+/* This only works with JavaScript, 
+if it's not present, don't show loader */
+.no-js #loader { display: none;  }
+.js #loader { display: block; position: absolute; left: 100px; top: 0; }
+.wait1 {
+	position: float;
+	left: 0px;
+	top: 0px;
+	width: 100%;
+	height: 200px;
+	z-index: 9999;
+	background: url(images/loader-128x/Preloader_7.gif) center no-repeat #fff;
+}
+
+.wait2 {
+	position: float;
+	left: 0px;
+	top: 0px;
+	width: 100%;
+	height: 200px;
+	z-index: 9999;
+	background: url(images/loader-128x/Preloader_1.gif) center no-repeat #fff;
 }

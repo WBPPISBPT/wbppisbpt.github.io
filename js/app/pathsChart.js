@@ -32,6 +32,8 @@ PathsChart.prototype.init = function () {
     self.divOuter = d3.select("#paths-chart-container");
     self.table = d3.select(".paths-table");
     self.tableBody = d3.select(".paths-table-body");
+
+    $('#paths-chart-container').hide();
 };
 
 
@@ -58,6 +60,9 @@ PathsChart.prototype.getData = function (_sample) {
         }
         else {
 
+            $('#paths-chart-container').show();
+            $('.wait2').show();
+
             let query = {
                 "sampleID": _sample[sampleUIDKey]
             };
@@ -76,8 +81,9 @@ PathsChart.prototype.getData = function (_sample) {
                     console.log("Got sample paths for ID", _sample[sampleUIDKey]);
                     console.log(data);
 
-                    $('#paths-chart-container').show();
+                    
                     self.pathsOrig = data;
+                    $('.wait2').hide();
                     self.update();
                     
                     /*
