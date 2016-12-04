@@ -1,4 +1,6 @@
-var database_URI = "http://localhost:8000";
+//var database_URI = "http://localhost:8000";
+
+var database_URI = "http://cs6630.sci.utah.edu:8000";
 
 
 var demo = false;
