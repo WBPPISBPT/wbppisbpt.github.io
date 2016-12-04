@@ -164,7 +164,7 @@ var removedSamples = {};
      */
     function init() {
 
-        GetRenderIteration(4);
+        //GetRenderIteration(4);
 
 
 
