@@ -39,7 +39,7 @@ PathsChart.prototype.init = function () {
 
 PathsChart.prototype.getData = function (_sample) {
     var self = this;
-    if (self.sample == undefined || self.sample[sampleUIDKey] != _sample[sampleUIDKey] ) {
+    if (self.sample == undefined || self.sample[sampleUIDKey] != _sample[sampleUIDKey]) {
 
         self.sample = _sample;
         self.modified = false;
@@ -57,8 +57,7 @@ PathsChart.prototype.getData = function (_sample) {
                 // self.pixelInfo();
                 self.update();
             });
-        }
-        else {
+        } else {
 
             $('#paths-chart-container').show();
             $('.wait2').show();
@@ -72,20 +71,18 @@ PathsChart.prototype.getData = function (_sample) {
             };
 
             $.ajax({
-                type: "GET"
-                    ,
-                url: database_URI + '/getFromCollection/SamplePaths'
-                    ,
+                type: "GET",
+                url: database_URI + '/getFromCollection/SamplePaths',
                 success: function (data, textStatus, jqXHR) {
                     console.log(textStatus)
                     console.log("Got sample paths for ID", _sample[sampleUIDKey]);
                     console.log(data);
 
-                    
+
                     self.pathsOrig = data;
                     $('.wait2').hide();
                     self.update();
-                    
+
                     /*
                     results = [];
                     data.forEach(function(d){
@@ -102,14 +99,12 @@ PathsChart.prototype.getData = function (_sample) {
                     console.log(results)
 
                     */
-                }
-                    ,
+                },
                 error: function (jqXHR, textStatus, errorThrown) {
                     console.log(textStatus);
                     console.log(jqXHR);
                     console.log(errorThrown);
-                }
-                    ,
+                },
                 data: send_data
             });
         }
@@ -133,48 +128,71 @@ PathsChart.prototype.update = function () {
     trMain = trMain.merge(trMainEnter);
 
 
-
-
-
-   // return;
-
-
     var tdMain = trMain.selectAll('.path-td-main')
         .data(function (d) {
 
             let val = d.value;
-            let fin_Contr = Math.sqrt(val.r*val.r + val.g*val.g + val.b*val.b);
+            let fin_Contr = Math.sqrt(val.r * val.r + val.g * val.g + val.b * val.b);
 
 
             if (d.sampleType == 'VC') {
 
                 return [
-                {'vis': 'type', 'value' : d.sampleType},
-                {'vis': 'show-detail', 'value': d[pathUIDKey]},
-                {'vis': 'uid', 'value': d[pathUIDKey]},
-                {'vis': 'fin-contrib', 'value': fin_Contr},
+                    
+                    {
+                        'vis': 'show-detail',
+                        'value': d[pathUIDKey]
+                    },
+                    {
+                        'vis': 'uid',
+                        'value': d[pathUIDKey]
+                    },
+                    {
+                        'vis': 'fin-contrib',
+                        'value': fin_Contr
+                    },
                 //,
                 //{'vis': 'throughput', 'value': d[pathThroughputKey]},
                 //{'vis': 'tot-prob', 'value': d[pathTotalProbabilityKey]},
                 //{'vis': 'edge-count', 'value': d[pathVerticesKey].length},
                 //{'vis': 'tp-d-tp', 'value': d[pathThroughputKey] / d[pathTotalProbabilityKey]},
-                {'vis': 'cameraVertices', 'value': d.cameraVertices},
-                {'vis': 'lightVertices', 'value': d.lightVertices}
-            ];
-
-
+                    {
+                        'vis': 'cameraVertices',
+                        'value': d.cameraVertices
+                    },
+                    {
+                        'vis': 'lightVertices',
+                        'value': d.lightVertices
+                    },
+                    {
+                        'vis': 'type',
+                        'value': d.sampleType
+                    }
+                ];
             }
 
             return [
-                {'vis': 'show-detail', 'value': d[pathUIDKey]},
-                {'vis': 'uid', 'value': d[pathUIDKey]},
-                {'vis': 'fin-contrib', 'value': fin_Contr},
+                {
+                    'vis': 'show-detail',
+                    'value': d[pathUIDKey]
+                },
+                {
+                    'vis': 'uid',
+                    'value': d[pathUIDKey]
+                },
+                {
+                    'vis': 'fin-contrib',
+                    'value': fin_Contr
+                },
                 //,
                 //{'vis': 'throughput', 'value': d[pathThroughputKey]},
                 //{'vis': 'tot-prob', 'value': d[pathTotalProbabilityKey]},
                 //{'vis': 'edge-count', 'value': d[pathVerticesKey].length},
                 //{'vis': 'tp-d-tp', 'value': d[pathThroughputKey] / d[pathTotalProbabilityKey]},
-                {'vis': 'vertices', 'value': d[pathVerticesKey]}
+                {
+                    'vis': 'vertices',
+                    'value': d[pathVerticesKey]
+                }
             ];
         });
 
@@ -196,14 +214,14 @@ PathsChart.prototype.update = function () {
         .data(finContribData.data());
 
     var finContribEnter = finContrib.enter();
-        // .append('p');
+    // .append('p');
 
     finContrib.exit().remove();
     finContrib = finContrib.merge(finContribEnter);
 
     finContrib.text(function (d) {
-            return d.value;
-        });
+        return d.value;
+    });
 
 };
 
@@ -221,8 +239,7 @@ PathsChart.prototype.setupAxis = function (param) {
     if (param == 'y') {
         axisFunction = d3.axisLeft();
         axisFunction.scale(self.yScale);
-    }
-    else {
+    } else {
         axisFunction = d3.axisBottom();
         axisFunction.scale(xAxisScale);
         axisFunction.ticks(0);
@@ -244,8 +261,7 @@ PathsChart.prototype.setupAxis = function (param) {
         .attr("transform", function () {
             if (param == 'y') {
                 return "translate(" + self.axisWidth + ", 10)";
-            }
-            else {
+            } else {
                 var translate = "translate(";
                 translate += self.axisWidth;
                 translate += ", ";
@@ -390,8 +406,7 @@ PathsChart.prototype.pixelInfo = function () {
                 return 'black';
             else
                 return 'white';
-        }
-        else
+        } else
             return 'white';
     }
 

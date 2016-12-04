@@ -100,19 +100,17 @@ SamplesChart.prototype.getData = function (_pixel) {
             };
 
             $.ajax({
-                type: "GET"
-                    ,
-                url: database_URI + '/getFromCollection/Samples'
-                    ,
+                type: "GET",
+                url: database_URI + '/getFromCollection/Samples',
                 success: function (data, textStatus, jqXHR) {
                     console.log(textStatus)
                     console.log("Got pixel sample values");
                     console.log(data)
-                    
+
                     results = [];
-                    data.forEach(function(d){
+                    data.forEach(function (d) {
                         results.push({
-                            fin_contrib: Math.sqrt(d.value.r*d.value.r + d.value.g*d.value.g + d.value.b*d.value.b),
+                            fin_contrib: Math.sqrt(d.value.r * d.value.r + d.value.g * d.value.g + d.value.b * d.value.b),
                             uid: d.uid,
                             r: d.value.r,
                             g: d.value.g,
@@ -125,16 +123,14 @@ SamplesChart.prototype.getData = function (_pixel) {
 
                     self.samplesOrig = results;
                     $('.wait1').hide();
-               
+
                     self.update();
-                }
-                    ,
+                },
                 error: function (jqXHR, textStatus, errorThrown) {
                     console.log(textStatus);
                     console.log(jqXHR);
                     console.log(errorThrown);
-                }
-                    ,
+                },
                 data: send_data
             });
         }
