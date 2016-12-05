@@ -1,32 +1,3 @@
-## Tools
-In order to produce this tool we used vaious libraries:
-
-  1) D3
-  D3 is used to construct and manipulate the different windows, and
-  dianamically display relevant information.
-
-  2) Jquery3.1.1
-  Jquety is used here to make queries on the data we collected. For instance 
-  when we want the samples associated with specific pixel.
-
-  3) Cropper.js
-  Cropper.js is library that allows us to cropped images. This enable us 
-  cropped the region selected by the user.
-
-## Code
-On top of the Visual design a lot code has been develloped the solve the problem at hand.
-  
-  1) Automatic detection.
-  We use the pixels intensities to automatically detect the outliers pixel.
-
-  2) Pixel cleanning
-  we implemented an algorithm that automatically fixed the outliers pixel.
-
-## Features
-Our tool has is numerous feature that can be used to process the images.
-We have incule a brief description of the different tools under each window
-that user can use as guide for non intuitive features.
-
 ## Web Based Post-Processing Image Statistics for Bidirectional Path Tracing 
 #### Developed by Hirad Sabaghian & Timbwaoga Aime Judicael Ouermi 
 #### Concept by Laura Lediaev 
@@ -34,11 +5,29 @@ that user can use as guide for non intuitive features.
 ### Introduction 
 This application is a web base tool that allows the users to explore the different hierarchies of data that combine to form an image (render) using Path Tracing techniques. The user can further identify problematic sample, path lengths, or objects and remove them or alter them to fit their need by sending representative of problematic data to the server which in turn will process the statistical data and return a new render. Furthermore the user is able to detect and fix problematic pixels with a high-level approach using automatic "firefly" detection and removal tools. ### Tools The following tools and technologies have been used extensively throughout this project: 
 * [D3.js](https://d3js.org/) 
-	* Test
+	* D3 is used to construct and manipulate the different windows, and dynamically display relevant information.
 * [jQuery](https://jquery.com/) 
+	* jQuery is used extensively for easy access of and manipulation of DOM elements and UI elements.
 * [HTML5 Canvas Element](https://developer.mozilla.org/en-US/docs/Web/API/Canvas_API) 
+	* Canvas elements are used throughout the project for modification and accessing pixel data using selectors or through algorithmic procedures.
 * [Cropper.js](https://github.com/fengyuanchen/cropper) 
+	* Cropper.js is provides easy to use API for cropping and manipulating images.
 * [Bootstrap](http://getbootstrap.com/) 
+	* Bootstrap is utilized to provide a responsive and uniform display.
+	
+### Code
+Besides the visual elements, there has been a lot of algorithmic developments and data management in this project.
+  
+* Automatic detection.
+	 * We calculate the relation of pixels to their neighbors to detect if a pixel is a possible outlier. 
+
+* Pixel Cleansing
+	 * Our visualization is capable of automatic detection and elimination of outlier pixels.
+
+### Features
+This visualization project provides a wide range of image and data inspection. Furthermore our approach in data allows other developers who work on open-source rendering engines to be able to easily integrate out front-end with their backend and provide a solution to other enthusiasts. 
+
+Each tool has self-explanatory description, and to reduce confusion every element is document as much as possible to guide the user through the data, and process.
 
 ### Background and Motivation 
 Bidirectional path tracing is a physically-based rendering technique. In many cases it is capable of producing a rendered image that is practically indistinguishable from a photograph. The rendering program attempts to simulate the physical properties of all elements of a scene, including lights, geometric objects, materials, and cameras. Path tracing is a Monte-Carlo integration technique that generates paths using probability distributions. Regular (unidirectional) path tracing starts by choosing a random position on the film plane and then randomly choosing a position on the camera aperture. These two choices will create a ray that shoots from the camera into the scene. Every time the ray intersects a surface, the material properties of the surface are used to choose a new direction to travel in. The ray continues to bounce around the scene until one of three conditions is met. The ray may hit a light creating a complete path, at which point the ray’s path is terminated. Alternatively, the ray may have bounced so many times that we choose to terminate it. Lastly, the scene might be open and the ray may have gone off into outer space (a non-hit). Every surface interaction, including the camera, is called a vertex. A complete path starts at the camera and ends at a light, and every vertex contains information needed to calculate the final color contribution for that path. ![](http://graphics.stanford.edu/~henrik/images/imgs/cbox_pathtracing.jpg) 
