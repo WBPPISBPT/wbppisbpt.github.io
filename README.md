@@ -35,9 +35,8 @@ This visualization project provides a wide range of image and data inspection. F
 Each tool has self-explanatory description, and to reduce confusion every element is document as much as possible to guide the user through the data, and process.
 
 ### URLS
-[Screen Cast URL]
-
-[Website URL] (https://wbppisbpt.github.io/)
+* [Screen Cast URL]
+* [Website URL] (https://wbppisbpt.github.io/)
 
 ### Background and Motivation 
 Bidirectional path tracing is a physically-based rendering technique. In many cases it is capable of producing a rendered image that is practically indistinguishable from a photograph. The rendering program attempts to simulate the physical properties of all elements of a scene, including lights, geometric objects, materials, and cameras. Path tracing is a Monte-Carlo integration technique that generates paths using probability distributions. Regular (unidirectional) path tracing starts by choosing a random position on the film plane and then randomly choosing a position on the camera aperture. These two choices will create a ray that shoots from the camera into the scene. Every time the ray intersects a surface, the material properties of the surface are used to choose a new direction to travel in. The ray continues to bounce around the scene until one of three conditions is met. The ray may hit a light creating a complete path, at which point the ray’s path is terminated. Alternatively, the ray may have bounced so many times that we choose to terminate it. Lastly, the scene might be open and the ray may have gone off into outer space (a non-hit). Every surface interaction, including the camera, is called a vertex. A complete path starts at the camera and ends at a light, and every vertex contains information needed to calculate the final color contribution for that path. ![](http://graphics.stanford.edu/~henrik/images/imgs/cbox_pathtracing.jpg) 
