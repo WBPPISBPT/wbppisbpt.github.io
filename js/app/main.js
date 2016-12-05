@@ -152,10 +152,11 @@ $('.open-about').on('click', function () {
         }
 
         $('#send-to-server').on('click', function () {
-            if (userModifications == userModificationsDefault)
+            if (Object.keys(userModifications.eliminatedPaths).length == 0 && Object.keys(userModifications.removedSamples).length == 0){
                 Confirm.show('No Adjustments Made', 'You have no made any modifications to be sent to server.');
+            }
             else if (serverSend == "")
-                Confirm.show('Server Not Found', 'Unfortunately we were unable to find a valid server to send you changes to!');
+                Confirm.show('Server Not Found', 'Unfortunately we were unable to contact the server!');
             else {
                 // Send info to server
             }
