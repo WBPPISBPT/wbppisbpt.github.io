@@ -1,3 +1,15 @@
+body{
+    font-family: 'Open Sans', sans-serif;
+}
+
+.btn{
+    font-family: 'Montserrat', sans-serif;
+}
+
+.alert{
+    font-family: 'Montserrat', sans-serif;
+}
+
 img {
     max-width: 100%; /* This rule is very important, please do not ignore this! */
     image-rendering: optimizeSpeed; /* STOP SMOOTHING, GIVE ME SPEED  */
@@ -25,16 +37,38 @@ footer {
     z-index: 1000;
 }
 
-.footer-expanded {
-    bottom: 0;
+table, td, th {
+    text-align: center;
 }
 
-.footer-collapsed {
-    bottom: -140px;
+th {
+    border-top: 1px solid #ddd !important;
 }
 
-.log-container {
-    margin-right: 15px;
+.nav-buffer{
+    margin-top: 50px;
+}
+
+a.navbar-brand {
+    font-family: Montserrat;
+    text-transform: uppercase;
+    color: white !important;
+}
+
+.navbar-bottom {
+    margin-bottom: 0;
+}
+
+.navbar-collapse {
+    text-align:center;
+}
+.navbar-nav {
+    display:inline-block;
+    float:none;
+}
+
+.min-height{
+    min-height: 200px;
 }
 
 .full-width {
@@ -53,10 +87,79 @@ footer {
     transition: all 0.2s ease;
 }
 
-
-.cropper-crop-box, .cropper-drag-box, .cropper-move, .cropper-wrap-box, .cropper-container, .cropper-bg, .cropper-canvas {
-    transition: none;
+.alert {
+    border-radius: 0px;
 }
+
+.btn {
+    border-radius: 0px;
+}
+
+.btn:focus {
+    outline: 0px !important;
+}
+
+.modal-content {
+    border-radius: 0;
+}
+
+.end-margin {
+    margin-bottom: 140px;
+}
+
+.about {
+    position: absolute;
+    width: 100%;
+    z-index: 999999999999;
+    background: #151515;
+    color: white;
+    padding-top: 50px;
+}
+
+.close-img {
+    position: fixed;
+    right: 20px;
+    bottom: 20px;
+    cursor: pointer;
+    filter: invert(100%);
+}
+
+.hr-section {
+    width: 100%;
+    height: 20px;
+    border-bottom: 1px solid black;
+    text-align: left;
+    margin-bottom: 15px;
+}
+
+.hr-section > span {
+    font-size: 20px;
+    background-color: white;
+    padding-right: 10px;
+    line-height: 38px;
+}
+
+.is-frozen {
+    filter: blur(5px) grayscale(100%);
+    -webkit-filter: blur(5px) grayscale(100%);
+    cursor: not-allowed !important;
+}
+
+/*Footer*/
+
+.footer-expanded {
+    bottom: 0;
+}
+
+.footer-collapsed {
+    bottom: -140px;
+}
+
+.log-container {
+    margin-right: 15px;
+}
+
+/*Log*/
 
 #log {
     height: 140px;
@@ -94,25 +197,13 @@ footer {
     border: 0px;
 }
 
-.alert {
-    border-radius: 0px;
+/*Cropper*/
+
+.cropper-crop-box, .cropper-drag-box, .cropper-move, .cropper-wrap-box, .cropper-container, .cropper-bg, .cropper-canvas {
+    transition: none;
 }
 
-.btn {
-    border-radius: 0px;
-}
-
-.btn:focus {
-    outline: 0px !important;
-}
-
-.modal-content {
-    border-radius: 0;
-}
-
-.end-margin {
-    margin-bottom: 140px;
-}
+/*Render Gallery*/
 
 .render-gallery {
     list-style: none;
@@ -133,9 +224,17 @@ footer {
     width: 100%;
 }
 
+/*Reconstruction*/
+
+#reconst-canvas {
+    width: 100%;
+}
+
 #reconst-outer > img, #render-outer > img {
     width: 100%;
 }
+
+/*Analyzer*/
 
 .cropper-canvas-container {
     width: 100%;
@@ -148,29 +247,31 @@ footer {
     width: 100%;
 }
 
-#finalize-selection {
+#cleanse-detection {
     font-size: 18px;
 }
 
-#indicator-outer {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
+.post-processing {
+    width: 50%;
+    font-size: 18px;
 }
 
-.selector-circle {
-    stroke: cyan;
-    stroke-width: 1px;
-    fill: rgba(255, 255, 255, 0);
-    cursor: pointer;
+#is-frozen-message-alert {
+    text-align: center;
+    font-size: 17px;
+    margin-bottom: 0;
 }
 
-.selector-current {
-    stroke: red;
-    stroke-width: 3px;
+#is-frozen-message-alert > strong {
+    text-decoration: underline;
 }
+
+#download-image-link {
+    color: white;
+    text-decoration: blink;
+}
+
+/*Analyzer Sensitivity*/
 
 input[type=range] {
     -webkit-appearance: none;
@@ -232,13 +333,34 @@ input[type=range]:focus::-webkit-slider-runnable-track {
     border-color: #0d47a1;
 }
 
-.selection-guide {
-    font-weight: bold;
-    height: 50px;
+/*SVG For Fireflies*/
+
+#indicator-outer {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
 }
 
-table, td, th {
+.selector-circle {
+    stroke: cyan;
+    stroke-width: 1px;
+    fill: rgba(255, 255, 255, 0);
+    cursor: pointer;
+}
+
+.selector-current {
+    stroke: red;
+    stroke-width: 3px;
+}
+
+/*Selection Guide*/
+
+.selection-guide {
     text-align: center;
+    font-weight: bold;
+    height: 50px;
 }
 
 .pixel-info > td {
@@ -249,6 +371,8 @@ table, td, th {
     width: calc(100% - 144px);
     float: left;
 }
+
+/*Samples Chart*/
 
 #samples-chart-outer {
     width: 100%;
@@ -278,75 +402,58 @@ table, td, th {
     margin-top: 10px;
 }
 
-.is-frozen {
-    filter: blur(5px) grayscale(100%);
-    -webkit-filter: blur(5px) grayscale(100%);
-    cursor: not-allowed !important;
-}
-
-#is-frozen-message-alert {
-    text-align: center;
-    font-size: 17px;
-    margin-bottom: 0;
-}
-
-#is-frozen-message-alert > strong {
-    text-decoration: underline;
-}
-
-.hr-section {
-    width: 100%;
-    height: 20px;
-    border-bottom: 1px solid black;
-    text-align: left;
-    margin-bottom: 15px;
-}
-
-.hr-section > span {
-    font-size: 20px;
-    background-color: white;
-    padding-right: 10px;
-    line-height: 38px;
-}
+/*Modal Custom*/
 
 .modal-backdrop-custom {
-    position: relative;
+    position: fixed;
     top: 0;
     right: 0;
     bottom: 0;
     left: 0;
     z-index: 1040;
-    background-color: rgba(0,0,0,.5);
+    background-color: rgba(0, 0, 0, .5);
 }
 
-.invisible {
-    visibility: hidden;
-    display: none;
+/*Path Chart*/
+
+.td-show-detail {
+    background: url(https://maxcdn.icons8.com/windows10/PNG/32/Messaging/visible-32.png);
+    background-position: center center;
+    background-repeat: no-repeat;
+    cursor: pointer;
+    width: 50px !important;
 }
 
-/* http://smallenvelop.com/display-loading-icon-page-loads-completely */
-
-/* Paste this css to your style sheet file or under head tag */
-/* This only works with JavaScript, 
-if it's not present, don't show loader */
-.no-js #loader { display: none;  }
-.js #loader { display: block; position: absolute; left: 100px; top: 0; }
-.wait1 {
-	position: float;
-	left: 0px;
-	top: 0px;
-	width: 100%;
-	height: 200px;
-	z-index: 9999;
-	background: url(images/loader-128x/Preloader_7.gif) center no-repeat #fff;
+.td-hide-detail {
+    background: url(https://maxcdn.icons8.com/windows10/PNG/32/Messaging/invisible-32.png);
+    background-position: center center;
+    background-repeat: no-repeat;
+    cursor: pointer;
+    width: 50px !important;
 }
 
-.wait2 {
-	position: float;
-	left: 0px;
-	top: 0px;
-	width: 100%;
-	height: 200px;
-	z-index: 9999;
-	background: url(images/loader-128x/Preloader_1.gif) center no-repeat #fff;
+.path-tr-eliminate {
+    background: url(https://maxcdn.icons8.com/iOS7/PNG/32/Very_Basic/minus-32.png);
+    background-position: center center;
+    background-repeat: no-repeat;
+    cursor: pointer;
 }
+
+.path-tr-eliminate.checked {
+    background: url(https://maxcdn.icons8.com/iOS7/PNG/32/Very_Basic/plus_filled-32.png);
+    background-position: center center;
+    background-repeat: no-repeat;
+    cursor: pointer;
+}
+
+.paths-table {
+    border: none !important;
+}
+
+.hidden-header {
+    border: 0 !important;
+    opacity: 0;
+}
+
+
+

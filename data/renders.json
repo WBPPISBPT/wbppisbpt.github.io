@@ -1,19 +1,6 @@
 {
 	"renders": [
-		{"uid": "TEST091", "thumbnailURI": "", "sourceURI": "", "width": 1461, "height": 1656, "samples" : 500},
-		{"uid": "TEST982", "thumbnailURI": "", "sourceURI": "", "width": 1704, "height": 1755, "samples" : 500},
-		{"uid": "TEST873", "thumbnailURI": "", "sourceURI": "", "width": 1498, "height": 1375, "samples" : 500},
-		{"uid": "TEST764", "thumbnailURI": "", "sourceURI": "", "width": 1876, "height": 1941, "samples" : 500},
-		{"uid": "TEST655", "thumbnailURI": "", "sourceURI": "", "width": 1122, "height": 1773, "samples" : 500},
-		{"uid": "TEST746", "thumbnailURI": "", "sourceURI": "", "width": 1807, "height": 1803, "samples" : 500},
-		{"uid": "TEST837", "thumbnailURI": "", "sourceURI": "", "width": 1145, "height": 1638, "samples" : 500},
-		{"uid": "TEST538", "thumbnailURI": "", "sourceURI": "", "width": 1143, "height": 1368, "samples" : 500},
-		{"uid": "TEST429", "thumbnailURI": "", "sourceURI": "", "width": 1060, "height": 1845, "samples" : 500},
-		{"uid": "TEST311", "thumbnailURI": "", "sourceURI": "", "width": 1345, "height": 1835, "samples" : 500},
-		{"uid": "TEST122", "thumbnailURI": "", "sourceURI": "", "width": 1703, "height": 1114, "samples" : 500},
-		{"uid": "TEST233", "thumbnailURI": "", "sourceURI": "", "width": 1372, "height": 1860, "samples" : 500},
-		{"uid": "TEST344", "thumbnailURI": "", "sourceURI": "", "width": 1797, "height": 1875, "samples" : 500},
-		{"uid": "TEST455", "thumbnailURI": "", "sourceURI": "", "width": 1698, "height": 1199, "samples" : 500},
-		{"uid": "TEST566", "thumbnailURI": "", "sourceURI": "", "width": 1049, "height": 1029, "samples" : 500}
+		{"uid": "R0", "type": "manual", "thumbnailURI": "data/images/image5.jpg", "sourceURI": "data/images/image5.jpg", "width": 1280, "height": 720, "samples" : 500},
+		{"uid": "R1", "type": "server", "thumbnailURI": "data/images/image.png", "sourceURI": "data/images/image.png", "width": 200, "height": 90, "samples" : 4}
 	]
 }

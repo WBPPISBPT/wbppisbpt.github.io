@@ -1,5 +1,6 @@
 <!doctype html>
 <html>
+
 <head>
     <meta charset="UTF-8">
     <title>Project</title>
@@ -7,12 +8,18 @@
     <script src="share/d3.min.js" charset="utf-8" type="text/javascript" defer></script>
     <script src="main.js" charset="utf-8" type="text/javascript" defer></script> -->
 
+    <link href="https://fonts.googleapis.com/css?family=Montserrat:400,700|Open+Sans:300,400,600" rel="stylesheet">
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.8.0/styles/default.min.css">
+    <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.8.0/highlight.min.js" defer></script>
+
     <link rel="stylesheet" href="css/bootstrap.min.css">
     <link rel="stylesheet" href="css/main.css">
     <link rel="stylesheet" href="css/cropper.min.css">
+    <link rel="stylesheet" href="css/tooltip-popover.css">
 
     <script src="js/libs/d3.v4.min.js" defer></script>
     <script src="js/libs/d3-legend.js" defer></script>
+    <script src="js/libs/d3-tip.js" defer></script>
     <script src="js/libs/jquery-3.1.1.min.js" defer></script>
     <script src="js/libs/jquery-scrollto.js" defer></script>
     <script src="js/libs/bootstrap.min.js" defer></script>
@@ -26,351 +33,387 @@
     <script src="js/app/main.js" defer></script>
 
 </head>
-<body>
 
-<!--
-<canvas id="renderCanvas" width="800" height="600"></canvas>
--->
+<body id="top">
+<div class="about">
+    <img src="https://maxcdn.icons8.com/windows8/PNG/48/User_Interface/close_window-48.png" class="close-img" title="Close About Page" width="48"
+         data-toggle="popover" data-trigger="hover"
+         data-content="You can open it again by clicking on the About link.">
+    <div class="container">
+        <div class="row about-outter">
+            <div class="col-md-12 about-inner">
+                <p>
+                    Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.
+
+                    Why do we use it?
+                    It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here', making it look like readable English. Many desktop publishing packages and web page editors now use Lorem Ipsum as their default model text, and a search for 'lorem ipsum' will uncover many web sites still in their infancy. Various versions have evolved over the years, sometimes by accident, sometimes on purpose (injected humour and the like).
 
 
-<div class="container-fluid no-pad">
+                    Where does it come from?
+                    Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots in a piece of classical Latin literature from 45 BC, making it over 2000 years old. Richard McClintock, a Latin professor at Hampden-Sydney College in Virginia, looked up one of the more obscure Latin words, consectetur, from a Lorem Ipsum passage, and going through the cites of the word in classical literature, discovered the undoubtable source. Lorem Ipsum comes from sections 1.10.32 and 1.10.33 of "de Finibus Bonorum et Malorum" (The Extremes of Good and Evil) by Cicero, written in 45 BC. This book is a treatise on the theory of ethics, very popular during the Renaissance. The first line of Lorem Ipsum, "Lorem ipsum dolor sit amet..", comes from a line in section 1.10.32.
 
-    <div class="fullWidthContent">
-        <div class="row">
-            <div class="col-sm-12">
-                <div class="container">
-                    <div id="gallery-region" class="row">
-                        <div class="col-sm-12 col-sm-12">
-                            <h3>Available Renders</h3>
-                            <ul class="render-gallery">
-                            </ul>
-                        </div>
-                    </div>
+                    The standard chunk of Lorem Ipsum used since the 1500s is reproduced below for those interested. Sections 1.10.32 and 1.10.33 from "de Finibus Bonorum et Malorum" by Cicero are also reproduced in their exact original form, accompanied by English versions from the 1914 translation by H. Rackham.
+                    Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.
+
+                    Why do we use it?
+                    It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here', making it look like readable English. Many desktop publishing packages and web page editors now use Lorem Ipsum as their default model text, and a search for 'lorem ipsum' will uncover many web sites still in their infancy. Various versions have evolved over the years, sometimes by accident, sometimes on purpose (injected humour and the like).
+
+
+                    Where does it come from?
+                    Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots in a piece of classical Latin literature from 45 BC, making it over 2000 years old. Richard McClintock, a Latin professor at Hampden-Sydney College in Virginia, looked up one of the more obscure Latin words, consectetur, from a Lorem Ipsum passage, and going through the cites of the word in classical literature, discovered the undoubtable source. Lorem Ipsum comes from sections 1.10.32 and 1.10.33 of "de Finibus Bonorum et Malorum" (The Extremes of Good and Evil) by Cicero, written in 45 BC. This book is a treatise on the theory of ethics, very popular during the Renaissance. The first line of Lorem Ipsum, "Lorem ipsum dolor sit amet..", comes from a line in section 1.10.32.
+
+                    The standard chunk of Lorem Ipsum used since the 1500s is reproduced below for those interested. Sections 1.10.32 and 1.10.33 from "de Finibus Bonorum et Malorum" by Cicero are also reproduced in their exact original form, accompanied by English versions from the 1914 translation by H. Rackham.
+                    Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.
+
+                    Why do we use it?
+                    It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here', making it look like readable English. Many desktop publishing packages and web page editors now use Lorem Ipsum as their default model text, and a search for 'lorem ipsum' will uncover many web sites still in their infancy. Various versions have evolved over the years, sometimes by accident, sometimes on purpose (injected humour and the like).
+
+
+                    Where does it come from?
+                    Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots in a piece of classical Latin literature from 45 BC, making it over 2000 years old. Richard McClintock, a Latin professor at Hampden-Sydney College in Virginia, looked up one of the more obscure Latin words, consectetur, from a Lorem Ipsum passage, and going through the cites of the word in classical literature, discovered the undoubtable source. Lorem Ipsum comes from sections 1.10.32 and 1.10.33 of "de Finibus Bonorum et Malorum" (The Extremes of Good and Evil) by Cicero, written in 45 BC. This book is a treatise on the theory of ethics, very popular during the Renaissance. The first line of Lorem Ipsum, "Lorem ipsum dolor sit amet..", comes from a line in section 1.10.32.
+
+                    The standard chunk of Lorem Ipsum used since the 1500s is reproduced below for those interested. Sections 1.10.32 and 1.10.33 from "de Finibus Bonorum et Malorum" by Cicero are also reproduced in their exact original form, accompanied by English versions from the 1914 translation by H. Rackham.
+                    Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.
+
+                    Why do we use it?
+                    It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here', making it look like readable English. Many desktop publishing packages and web page editors now use Lorem Ipsum as their default model text, and a search for 'lorem ipsum' will uncover many web sites still in their infancy. Various versions have evolved over the years, sometimes by accident, sometimes on purpose (injected humour and the like).
+
+
+                    Where does it come from?
+                    Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots in a piece of classical Latin literature from 45 BC, making it over 2000 years old. Richard McClintock, a Latin professor at Hampden-Sydney College in Virginia, looked up one of the more obscure Latin words, consectetur, from a Lorem Ipsum passage, and going through the cites of the word in classical literature, discovered the undoubtable source. Lorem Ipsum comes from sections 1.10.32 and 1.10.33 of "de Finibus Bonorum et Malorum" (The Extremes of Good and Evil) by Cicero, written in 45 BC. This book is a treatise on the theory of ethics, very popular during the Renaissance. The first line of Lorem Ipsum, "Lorem ipsum dolor sit amet..", comes from a line in section 1.10.32.
+
+                    The standard chunk of Lorem Ipsum used since the 1500s is reproduced below for those interested. Sections 1.10.32 and 1.10.33 from "de Finibus Bonorum et Malorum" by Cicero are also reproduced in their exact original form, accompanied by English versions from the 1914 translation by H. Rackham.
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<nav class="navbar navbar-inverse navbar-fixed-top">
+    <div class="container-fluid">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse"
+                    data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="#">WBPPISBPT</a>
+        </div>
+
+        <ul class="nav navbar-nav navbar-right">
+            <li><a class="open-about" href="#">About</a></li>
+            <li><a href="#top">Render Gallery</a></li>
+            <li><a href="#render-region">Crop Selection</a></li>
+            <li><a href="#analyzer-region">Analyzer</a></li>
+            <li><a href="#samples-chart-container">Samples Chart</a></li>
+            <li><a href="#paths-chart-container">Paths Chart</a></li>
+            <li><a href="https://github.com/WBPPISBPT/wbppisbpt.github.io" target="_blank">Github</a></li>
+        </ul>
+    </div>
+    </div>
+</nav>
+
+<div class="container nav-buffer">
+
+    <div id="gallery-region" class="row">
+        <div class="col-sm-12 col-sm-12">
+            <h3>Available Renders</h3>
+            <ul class="render-gallery">
+            </ul>
+        </div>
+    </div>
+
+    <div id="render-region" class="row top-buffer">
+        <div class="col-md-12">
+            <h3>Render</h3>
+            <div class="col-xs-12" data-toggle="popover" title="Region Selection"
+                 data-content="The view below allows you to select a region of at most 80 by 80 pixels in the render where fireflies occur.">
+                <div id="render-outer" class="row">
+                    <img id="render-image" src="data/images/image2.jpg">
                 </div>
+            </div>
+            <div id="region-alert" class="alert alert-danger">
+                <p> </p>
+                The window above is interactive. Use the following guide to familiarize yourself with the basic
+                operations available.
+            </div>
+            <div class="selection-guide col-md-4">
+                <img src="https://maxcdn.icons8.com/iOS7/PNG/25/Computer_Hardware/scrolling-25.png" title="Mouse Wheel"
+                     width="25">
+                Zoom
+            </div>
+            <div class="selection-guide col-md-4">
+                <img src="https://maxcdn.icons8.com/iOS7/PNG/25/Computer_Hardware/left_click_filled-25.png"
+                     title="Mouse Left Click" width="25">
+                Drag
+            </div>
+            <div class="selection-guide col-md-4">
+                <img src="https://maxcdn.icons8.com/Android/PNG/32/Editing/resize-32.png" title="Box Corners"
+                     width="25">
+                Resize
             </div>
         </div>
     </div>
 
-    <div id="render-region" class="fullWidthContent">
-        <div class="row">
-            <div class="col-sm-12">
-                <div class="container">
-                    <div class="row top-buffer">
-                        <div class="col-md-12">
-                            <h3>Render</h3>
-                            <div class="col-xs-12">
-                                <div id="render-outer" class="row">
+    <div id="analyzer-region" class="row top-buffer">
+        <div class="col-md-6">
+            <h3>Analyzer Region</h3>
+            <div class="col-xs-12">
+                <div id="cropper-outer" class="row">
+                    <div class="cropper-canvas-container preview-lg"></div>
+                </div>
+                <div id="indicator-outer">
+                    <svg id="indicator-svg"></svg>
+                </div>
+            </div>
 
-
-                                     
-
-
-                                    <img id="render-image" src="data/images/download.png">
-                                    <!--<img id="render-image" src="http://placehold.it/50x50&text=Not+Render+Selected">-->
-                                </div>
-                            </div>
-                            <div id="region-alert" class="alert alert-danger">
-                                <p> </p>
-                                The window above is interactive. Use the following guide to familiarize yourself with
-                                the basic
-                                operations available.
-                            </div>
-                            <div class="selection-guide col-md-2">
-                                <img src="https://maxcdn.icons8.com/iOS7/PNG/25/Computer_Hardware/scrolling-25.png"
-                                     title="Mouse Wheel" width="25">
-                                Zoom
-                            </div>
-                            <div class="selection-guide col-md-2">
-                                <img src="https://maxcdn.icons8.com/iOS7/PNG/25/Computer_Hardware/left_click_filled-25.png"
-                                     title="Mouse Left Click" width="25">
-                                Drag
-                            </div>
-                            <div class="selection-guide col-md-2">
-                                <img src="https://maxcdn.icons8.com/Android/PNG/32/Editing/resize-32.png"
-                                     title="Box Corners"
-                                     width="25">
-                                Resize
-                            </div>
-                        </div>
-                        <!--<div class="col-md-6">-->
-                        <!--<h3>Reconstruction</h3>-->
-                        <!--<div class="col-xs-12">-->
-                        <!--<div id="reconst-outer" class="row">-->
-                        <!--<img id="reconst-image" src="">-->
-                        <!--</div>-->
-                        <!--</div>-->
-                        <!--<div class="alert alert-info">-->
-                        <!--<p> </p>-->
-                        <!--Reconstruction will occur at the <strong>paths level</strong>. You must select a firefly first, and-->
-                        <!--proceed to choose a sample and paths.-->
-                        <!--</div>-->
-                        <!--</div>-->
-                    </div>
+            <div id="region-guide">
+                <div class="selection-guide col-md-4">
+                    <img src="https://maxcdn.icons8.com/iOS7/PNG/25/Computer_Hardware/left_click_filled-25.png"
+                         title="Mouse Left Click" width="25">
+                    Select Pixel
+                </div>
+                <div class="selection-guide col-md-4">
+                    <img src="https://maxcdn.icons8.com/iOS7/PNG/25/Computer_Hardware/left_click_filled-25.png"
+                         title="Mouse Left Click" width="25">
+                    Analyze Selection
+                </div>
+                <div class="selection-guide col-md-4">
+                    <img src="https://maxcdn.icons8.com/iOS7/PNG/25/Computer_Hardware/right_click_filled-25.png"
+                         title="Mouse Right Click" width="25">
+                    Remove Selection
                 </div>
             </div>
         </div>
-    </div>
+        <div class="col-md-6">
+            <h3> </h3>
+            <div id="analyzer-section">
 
-    <div class="fullWidthContent">
-        <div class="row">
-            <div class="col-sm-12">
-                <div class="container">
-                    <!--BEGIN-->
-                    <div id="is-frozen-message" class="row top-buffer" style="display: none;">
-                        <div class="col-md-12">
-                            <div id="is-frozen-message-alert" class="alert alert-danger">
-                                The above modules have been locked to prevent loss of analysis data. In order to select
-                                a different
-                                render or change the cropped region, you must unlock these modules by clicking on
-                                <strong>Discard
-                                    Detection</strong> below.
-                            </div>
-                        </div>
-                    </div>
-                    <!--END-->
+                <div class="btn-group full-width" data-toggle="buttons">
+                    <label class="btn btn-primary active post-processing">
+                        <input type="radio" name="options" value="user-pp" autocomplete="off" checked>
+                        User Post Processing
+                    </label>
+                    <label class="btn btn-primary post-processing">
+                        <input type="radio" name="options" value="server-pp" autocomplete="off">
+                        Server Post Processing
+                    </label>
                 </div>
-            </div>
-        </div>
-    </div>
 
+                <div class="top-buffer"> </div>
 
-    <div id="analyzer-region" class="fullWidthContent">
-        <div class="row">
-            <div class="col-sm-12">
-                <div class="container">
-                    <!--BEGIN-->
-                    <div class="row top-buffer">
-                        <div class="col-md-6">
-                            <h3>Analyzer Region</h3>
-                            <div class="col-xs-12">
-                                <div id="cropper-outer" class="row">
-                                    <div class="cropper-canvas-container preview-lg"></div>
-                                </div>
-                                <div id="indicator-outer">
-                                    <svg id="indicator-svg"></svg>
-                                </div>
-                            </div>
+                <button id="cleanse-detection" class="btn btn-success full-width">
+                    Auto Cleanse
+                </button>
 
-                            <div id="region-guide">
-                                <div class="selection-guide col-md-4">
-                                    <img src="https://maxcdn.icons8.com/iOS7/PNG/25/Computer_Hardware/left_click_filled-25.png"
-                                         title="Mouse Left Click" width="25">
-                                    Select Pixel
-                                </div>
-                                <div class="selection-guide col-md-4">
-                                    <img src="https://maxcdn.icons8.com/iOS7/PNG/25/Computer_Hardware/left_click_filled-25.png"
-                                         title="Mouse Left Click" width="25">
-                                    Analyze Selection
-                                </div>
-                                <div class="selection-guide col-md-4">
-                                    <img src="https://maxcdn.icons8.com/iOS7/PNG/25/Computer_Hardware/right_click_filled-25.png"
-                                         title="Mouse Right Click" width="25">
-                                    Remove Selection
-                                </div>
-                            </div>
+                <div id="finalize-freeze-alert" class="alert alert-success">
+                    Double click on any pixel to blend it with its neighbours, or click on <strong>Auto Cleanse</strong>
+                    to quickly clean this patch. Move the cropbox on top to update the view.
+                </div>
+
+                <div id="analyzer-controls">
+                    <div id="slider-outer">
+                        <div class="hr-section">
+                            <span>Detection Sensitivity</span>
                         </div>
-                        <div class="col-md-6">
-                            <h3> </h3>
-                            <div id="analyzer-section">
-                                <button id="finalize-selection" class="btn btn-success full-width">Begin Detection
-                                </button>
+                        <div class="col-xs-8 no-pad">
 
-                                <div id="finalize-freeze-alert" class="alert alert-success">
-                                    This step is <strong>necessary</strong>. Once the detection process is initiated,
-                                    your cropbox
-                                    will be analyzed for fireflies. Furthermore you can manually select fireflies.
-                                </div>
-
-                                <div id="analyzer-controls">
-                                    <div id="slider-outer" style="display: none;">
-                                        <div class="hr-section">
-                                            <span>Detection Precision</span>
-                                        </div>
-                                        <div class="col-xs-8 no-pad">
-
-                                            <input id="slider-threshold" type="range" min="1" max="10" step="0.1"
-                                                   value="2"/>
-                                            <div class="range-info" style="float:left; ">Most Precise</div>
-                                            <div class="range-info" style="float:right; ">Least Precise</div>
-                                            <hr>
-                                        </div>
-                                        <div class="col-xs-4" style="padding-right:0; ">
-                                            <div class="input-group">
-                                                <input id="input-threshold" type="text" placeholder="Manual Input">
-                                                <span class="input-group-btn">
+                            <input id="slider-threshold" type="range" min="1" max="10" step="0.1" value="2"/>
+                            <div class="range-info" style="float:left; ">Least Sensitive</div>
+                            <div class="range-info" style="float:right; ">Most Sensitive</div>
+                            <hr>
+                        </div>
+                        <div class="col-xs-4" style="padding-right:0; ">
+                            <div class="input-group">
+                                <input id="input-threshold" type="text" placeholder="Manual Input">
+                                <span class="input-group-btn">
                                         <button id="set-threshold" class="btn btn-info"
                                                 type="button">Set Precision</button>
                                     </span>
-                                            </div>
-                                        </div>
-
-                                        <hr>
-                                        <div class="top-buffer"> </div>
-                                    </div>
-                                    <div class="hr-section">
-                              <span>
-                                  Crop Box Info
-                              </span>
-                                    </div>
-                                    <table class="table table-hover">
-                                        <thead>
-                                        <tr>
-                                            <th>Left</th>
-                                            <th>Top</th>
-                                            <th>Width</th>
-                                            <th>Height</th>
-                                        </tr>
-                                        </thead>
-                                        <tbody>
-                                        <tr>
-                                            <td id="cropX"></td>
-                                            <td id="cropY"></td>
-                                            <td id="cropWidth"></td>
-                                            <td id="cropHeight"></td>
-                                        </tr>
-                                        </tbody>
-                                    </table>
-                                    <hr>
-                                    <a id="download" class="btn btn-info full-width" href="#" download="cropped.jpg">Download
-                                        the
-                                        croppped region</a>
-                                </div>
-
                             </div>
                         </div>
+
+                        <hr>
+                        <div class="top-buffer"> </div>
                     </div>
-                    <!--END-->
-                </div>
-            </div>
-        </div>
-    </div>
-
-
-    <div id="samples-region" class="fullWidthContent">
-        <div class="row">
-            <div class="col-sm-12">
-                <div class="container">
-                    <!--BEGIN-->
-                    
-
-                    <div id="samples-chart-container" class="row top-buffer">    <!-- Row Start -->
-                        <div class="col-md-12">
-                            <h2>Pixel Information & Samples</h2>
-
-                            <table class="table table-bordered  pixel-table" style="float: left">
-                                <thead>
-                                <tr class="pixel-info">
-                                    <td id="pixelX"></td>
-                                    <td id="pixelY"></td>
-                                    <td id="pixelCol"></td>
-                                    <td id="pixelRed"></td>
-                                    <td id="pixelGreen"></td>
-                                    <td id="pixelBlue"></td>
-                                </tr>
-                                </thead>
-                            </table>
-
-
-
-                            <button type="button" id="sort-reset" class="btn samples-chart-button btn-default">
-                                <img src="https://maxcdn.icons8.com/windows8/PNG/26/Computer_Hardware/restart-26.png"
-                                     title="Reset to Original" width="26">
-                            </button>
-
-                            <button type="button" id="sort-ascending" class="btn samples-chart-button btn-default">
-                                <img src="https://maxcdn.icons8.com/windows8/PNG/26/Data/Generic_Sorting-26.png"
-                                     title="Ascending Sort" width="26" style="transform: scaleY(-1) rotate(90deg);">
-                            </button>
-
-                            <button type="button" id="sort-descending" class="btn samples-chart-button btn-default">
-                                <img src="https://maxcdn.icons8.com/windows8/PNG/26/Data/Generic_Sorting-26.png"
-                                     title="Descending Sort" width="26" style="transform: rotate(-90deg);">
-                            </button>
-
-                            <div class="wait1"></div>
-
-                            <div id="samples-chart-wrapper" class="col-md-12">
-                                <div id="legend"></div>
-                                <div id="samples-chart-outer"></div>
-                            </div>
-
-                            <div>
-                                <div class="selection-guide col-md-2">
-                                    <img src="https://maxcdn.icons8.com/iOS7/PNG/25/Computer_Hardware/left_click_filled-25.png"
-                                         title="Mouse Left Click" width="25">
-                                    Analyze Sample
-                                </div>
-                                <div class="selection-guide col-md-2">
-                                    <img src="https://maxcdn.icons8.com/iOS7/PNG/25/Computer_Hardware/right_click_filled-25.png"
-                                         title="Mouse Right Click" width="25">
-                                    Remove Sample
-                                </div>
-                            </div>
-                        </div>
+                    <div class="hr-section">
+                        <span>Crop Box Info</span>
                     </div>
-                    <!--END-->
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div id="paths-region" class="fullWidthContent">
-        <div class="row">
-            <div class="col-sm-12">
-                <div class="container">
-                    <!--BEGIN-->
-                    <div id="paths-chart-container" class="row top-buffer">    <!-- Row Start -->
-                        <div class="col-md-12">
-                            <h2>Paths</h2>
-
-                            <div class="wait2"></div>
-
-                            <table class="table table-bordered  paths-table" style="float: left">
-                                <tbody class="paths-table-body">
-
-                                </tbody>
-
-                            </table>
-                        </div>
+                    <table class="table table-hover">
+                        <thead>
+                        <tr>
+                            <th>Left</th>
+                            <th>Top</th>
+                            <th>Width</th>
+                            <th>Height</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr>
+                            <td id="cropX"></td>
+                            <td id="cropY"></td>
+                            <td id="cropWidth"></td>
+                            <td id="cropHeight"></td>
+                        </tr>
+                        </tbody>
+                    </table>
+                    <hr>
+                    <div class="btn-group full-width download-reset" style="display: none">
+                        <label id="download-image" class="btn btn-success post-processing">
+                            <a id="download-image-link" href="#" download="cleansed.jpg">Download
+                                Image</a>
+                        </label>
+                        <label id="reset-to-original" class="btn btn-danger post-processing">
+                            Reset to Original
+                        </label>
                     </div>
-                    <!--END-->
+
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <div id="samples-chart-container" class="row top-buffer">
+        <!-- Row Start -->
+        <div class="col-md-12">
+            <h2 id="scroll-top">Pixel Information & Samples</h2>
+
+            <table class="table table-bordered  pixel-table" style="float: left">
+                <thead>
+                <tr class="pixel-info">
+                    <td id="pixelX"></td>
+                    <td id="pixelY"></td>
+                    <td id="pixelCol"></td>
+                    <td id="pixelRed"></td>
+                    <td id="pixelGreen"></td>
+                    <td id="pixelBlue"></td>
+                </tr>
+                </thead>
+            </table>
+
+            <button type="button" id="sort-reset" class="btn samples-chart-button btn-default" data-toggle="popover"
+                    title="Reset Samples"
+                    data-content="Resets the samples histogram to its original sorting. Also restores all removed samples from the collection.">
+                <img src="https://maxcdn.icons8.com/windows8/PNG/26/Computer_Hardware/restart-26.png"
+                     width="26">
+            </button>
+
+            <button type="button" id="sort-ascending" class="btn samples-chart-button btn-default" data-toggle="popover"
+                    title="Sort Ascending"
+                    data-content="Sorts the samples in the order of ascending final contribution.">
+                <img src="https://maxcdn.icons8.com/windows8/PNG/26/Data/Generic_Sorting-26.png"
+                     width="26" style="transform: scaleY(-1) rotate(90deg);">
+            </button>
+
+            <button type="button" id="sort-descending" class="btn samples-chart-button btn-default"
+                    data-toggle="popover" title="Sort Descending"
+                    data-content="Sorts the samples in the order of descending final contribution.">
+                <img src="https://maxcdn.icons8.com/windows8/PNG/26/Data/Generic_Sorting-26.png"
+                     width="26" style="transform: rotate(-90deg);">
+            </button>
+
+            <div id="samples-chart-wrapper" class="col-md-12">
+                <div id="legend"></div>
+                <div id="samples-chart-outer"></div>
+            </div>
+
+            <div>
+                <div class="selection-guide col-md-2">
+                    <img src="https://maxcdn.icons8.com/iOS7/PNG/25/Computer_Hardware/left_click_filled-25.png"
+                         title="Mouse Left Click" width="25"> Analyze Sample
+                </div>
+                <div class="selection-guide col-md-2">
+                    <img src="https://maxcdn.icons8.com/iOS7/PNG/25/Computer_Hardware/right_click_filled-25.png"
+                         title="Mouse Right Click" width="25"> Remove Sample
                 </div>
             </div>
         </div>
     </div>
 
-
-    <div class="fullWidthContent">
-        <div class="row">
-            <div class="col-sm-12">
-                <div class="container">
-                    <!--BEGIN-->
-
-                    <!--END-->
-                </div>
-            </div>
+    <div id="paths-chart-container" class="row top-buffer">
+        <!-- Row Start -->
+        <div class="col-md-12">
+            <h2>Paths</h2>
+            <table class="table table-bordered paths-table" style="float: left">
+                <thead>
+                <tr>
+                    <th class="hidden-header"></th>
+                    <th>Path ID</th>
+                    <th>Weight</th>
+                    <th>R</th>
+                    <th>G</th>
+                    <th>B</th>
+                    <th>Path Length</th>
+                </tr>
+                </thead>
+                <tbody class="paths-table-body">
+                </tbody>
+            </table>
         </div>
     </div>
 
+    <div id="send-to-server" class="row top-buffer" style="display: none">
+        <!-- Row Start -->
+        <div class="col-md-12">
+            <button id="send-to-server-btn" class="btn btn-success full-width">
+                Ask Render Server for Reconstruction
+            </button>
+            <table class="table table-bordered">
+                <thead>
+                <tr>
+                    <th>Eliminate Samples:</th>
+                    <th>Omit Paths of Length:</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td id="sample-recont-cmd"></td>
+                    <td id="path-recont-cmd"></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+</div>
 
+<div class="min-height">
+
+</div>
+<div class="collapse navbar-collapse navbar-default">
+    <ul class="nav navbar-nav center-block">
+        <li><a href="#top">Render Gallery</a></li>
+        <li><a href="#render-region">Crop Selection</a></li>
+        <li><a href="#analyzer-region">Analyzer</a></li>
+        <li><a href="#samples-chart-container">Samples Chart</a></li>
+        <li><a href="#paths-chart-container">Paths Chart</a></li>
+        <li><a href="https://github.com/WBPPISBPT/wbppisbpt.github.io" target="_blank">Github</a></li>
+    </ul>
+</div>
 </div>
 
 
+<!--<div class="container">-->
+<!--<footer class="footer-collapsed">-->
+<!--<div class="container">-->
+<!--<div class="row log-container">-->
+<!--<button class="btn btn-danger log-btn">▲</button>-->
+<!--<div id="log" class="col-md-12">-->
 
-<hr>
+<!--</div>-->
+<!--</div>-->
+<!--</div>-->
+<!--</footer>-->
+<!--</div>-->
+<div class="col-xs-12" style='display:none'>
+    <div id="reconst-outer" class="row">
+        <canvas id="reconst-canvas"></canvas>
+    </div>
 </div>
-<div class="container">
-    <footer class="footer-collapsed">
-        <div class="container">
-            <div class="row log-container">
-                <button class="btn btn-danger log-btn">▲</button>
-                <div id="log" class="col-md-12">
-
-                </div>
-            </div>
-        </div>
-    </footer>
-</div>
-
+<canvas id='blank' style='display:none'></canvas>
 </body>
+
 </html>

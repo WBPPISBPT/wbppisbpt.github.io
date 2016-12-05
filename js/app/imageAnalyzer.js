@@ -1,10 +1,10 @@
 var galleryUIDKey = "uid";
+var galleryTypeKey = "type";
 var galleryThumbURIKey = "thumbnailURI";
 var gallerySourceURIKey = "sourceURI";
 var galleryWidthKey = "width";
 var galleryHeightKey = "height";
 var gallerySamplesCountKey = "samples";
-
 
 /**
  * Constructor for ImageAnalyzer
@@ -19,11 +19,11 @@ function ImageAnalyzer(samplesChart, pathsChart, renders) {
     s.samplesChart = samplesChart;
     s.pathsChart = pathsChart;
     s.renders = renders;
+    s.isServer = false;
+    s.renderUID;
 
-    // s.MT = new Multithread(2);
     s.init();
 }
-
 
 ImageAnalyzer.prototype.init = function () {
     var s = this;
@@ -31,13 +31,14 @@ ImageAnalyzer.prototype.init = function () {
     s.cropperCanvas;
     s.oldCropBoxData;
 
+    s.reconstCanvas;
+
     s.outlierPixels = [];
     s.ratioThreshold = 2;
     s.selectionThreshold = 80;
     s.previousSelection = -1;
 
     s.canFreeze = false;
-
 
     s.sliderInstantiated = false;
     s.sliderOnChange = false;
@@ -73,10 +74,12 @@ ImageAnalyzer.prototype.init = function () {
  * @returns {*} URI of thumb, source, or a generic placeholder
  */
 ImageAnalyzer.prototype.getURI = function (d, type) {
+    var s = this;
+    var placeholder;
     if (type == 'thumb') {
         if (d[galleryThumbURIKey] == '' || d[galleryThumbURIKey] == null) {
             if (d[gallerySourceURIKey] == '' || d[gallerySourceURIKey] == null) {
-                var placeholder = 'https://unsplash.it/' + d[galleryWidthKey] + '/' + d[galleryHeightKey] + '&text=' + d[galleryUIDKey];
+                placeholder = 'https://unsplash.it/' + d[galleryWidthKey] + '/' + d[galleryHeightKey] + '&text=' + d[galleryUIDKey];
                 return placeholder;
             }
             return d[gallerySourceURIKey];
@@ -87,7 +90,7 @@ ImageAnalyzer.prototype.getURI = function (d, type) {
     }
     else {
         if (d[gallerySourceURIKey] == '' || d[gallerySourceURIKey] == null) {
-            var placeholder = 'https://unsplash.it/' + d[galleryWidthKey] + '/' + d[galleryHeightKey] + '&text=' + d[galleryUIDKey];
+            placeholder = 'https://unsplash.it/' + d[galleryWidthKey] + '/' + d[galleryHeightKey] + '&text=' + d[galleryUIDKey];
             return placeholder;
         }
         else {
@@ -95,7 +98,6 @@ ImageAnalyzer.prototype.getURI = function (d, type) {
         }
     }
 };
-
 
 /**
  * Initializes the render thumbnail gallery, selected render, reconstructed
@@ -107,8 +109,26 @@ ImageAnalyzer.prototype.update = function () {
 
     var renderWidth = s.selectedRender[0].naturalWidth;
     var renderHeight = s.selectedRender[0].naturalHeight;
-    $('#reconst-image').attr('src', 'https://placehold.it/' + renderWidth / 3 + 'x' + renderHeight / 3 + '&text=Reconstruction+Not+Executed');
 
+    s.setupGallery();
+
+    $('#input-threshold').val(11 - s.ratioThreshold);
+    $('#slider-threshold').val(11 - s.ratioThreshold);
+
+    $(".post-processing").on('click', function (e) {
+        var cmd = $(this).find("input").val();
+        s.setupPPType(cmd, e);
+    });
+
+    $("#reset-to-original").on('click', function (e) {
+        s.resetReconstCanvas();
+    });
+
+    s.cropper();
+};
+
+ImageAnalyzer.prototype.setupGallery = function () {
+    var s = this;
     var galleryContainer = d3.select('.render-gallery')
     var galleryItem = galleryContainer.selectAll('li')
         .data(s.renders['renders']);
@@ -132,19 +152,100 @@ ImageAnalyzer.prototype.update = function () {
             return 'thumb-' + d[galleryUIDKey];
         })
         .on("click", function (d) {
-            if (!isFrozen) {
-                $('#reconst-image').attr('src', 'https://placehold.it/' + d[galleryWidthKey] / 3 + 'x' + +d[galleryHeightKey] / 3 + '&text=Reconstruction+Not+Executed');
+            if (!isFrozen && d[galleryUIDKey] != s.renderUID) {
+                s.renderUID = d[galleryUIDKey];
+                s.outlierPixels = [];
+
+                s.drawFireflyIndicators();
+
+                var index = s.renders['renders'].findIndex(function (element) {
+                    return element[galleryUIDKey] == s.renderUID;
+                });
+
+                if (d[galleryTypeKey] == 'manual') {
+                    $("input[value='server-pp']").parent('label').removeClass('active');
+                    $("input[value='user-pp']").parent('label').addClass('active');
+                    s.isServer = false;
+                    $('#cleanse-detection').text('Auto Cleanse');
+                }
+
+                var pixelCountText = "Double click on any pixel to blend it with its neighbours, or click on <strong>Auto Cleanse</strong> to quickly clean this patch. Move the cropbox on top to update the view.";
+
+                $('#finalize-freeze-alert').html(pixelCountText);
+
                 s.selectedRender.cropper("setDragMode", "crop");
                 s.selectedRender.cropper("replace", s.getURI(d, null));
-                removedSamples = {};
+
+                $('.download-reset').fadeOut(350, 'linear');
+                $('#paths-chart-container').fadeOut(350, 'linear');
+                $('#reconstruct-server-container').fadeOut(350, 'linear');
+                $('#samples-chart-container').fadeOut(350, 'linear', function () {
+                    $('html, body').animate({
+                        scrollTop: $("#render-region").offset().top
+                    }, 200);
+                });
+
+                userModifications = userModificationsDefault;
+                s.initializeReconstCanvas();
             }
         });
+};
 
+ImageAnalyzer.prototype.setupPPType = function (cmd, event) {
+    var s = this;
+    var cleanseDetectionButton = $('#cleanse-detection');
 
-    $('#input-threshold').val(s.ratioThreshold);
-    $('#slider-threshold').val(s.ratioThreshold);
+    if (cmd == 'user-pp' && s.isServer) {
+        s.isServer = false;
+        cleanseDetectionButton.text('Auto Cleanse');
+        var popOptCleanse = {
+            title: 'Auto Cleanse',
+            content: 'Cleanses each patch automatically. Useful for quick touch-ups.',
+            trigger: 'hover',
+            container: 'body',
+            placement: 'auto top'
+        };
 
-    s.cropper();
+        setPopover(cleanseDetectionButton, popOptCleanse);
+
+        if (isFrozen) {
+            s.cleanseDetectionBtnDiscard('user-pp');
+        }
+
+        s.updateCleanseAlert('user');
+
+        s.manualDetectFireflies();
+    }
+    else if (cmd == 'server-pp' && !s.isServer) {
+        var index = s.renders['renders'].findIndex(function (element) {
+            return element[galleryUIDKey] == s.renderUID;
+        });
+
+        if (index >= 0 && s.renders['renders'][index][galleryTypeKey] == 'server') {
+            s.isServer = true;
+            s.selectedRender.cropper("replace", s.selectedRender.attr('src'));
+            s.refreshData();
+
+            cleanseDetectionButton.text('Begin Outlier Detection');
+            $('#indicator-outer').off("click");
+
+            s.updateCleanseAlert('server');
+            $('.download-reset').fadeOut(350, 'linear');
+            var popOptBegin = {
+                title: 'Begins Detection',
+                content: 'All controls above this region will be locked to prevent loss of data.',
+                trigger: 'hover',
+                container: 'body',
+                placement: 'auto top'
+            };
+            setPopover(cleanseDetectionButton, popOptBegin);
+        }
+        else {
+            event.stopImmediatePropagation();
+            Confirm.show('Data Unavailable', 'Unfortunately no data was generated for this render and server post-processing is unavailable.');
+            $(event.target).removeClass('active');
+        }
+    }
 };
 
 /**
@@ -187,9 +288,15 @@ ImageAnalyzer.prototype.cropper = function () {
         },
         'cropmove.cropper': function (e) {
             // e.type, e.action
+            if (!s.isServer) {
+                $('#indicator-svg').empty();
+            }
         },
         'cropend.cropper': function (e) {
             // e.type, e.action
+            if (!s.isServer) {
+                s.refreshData();
+            }
             s.selectedRender.cropper("setDragMode", "move");
             s.cropBoxSize('get');
         },
@@ -200,8 +307,6 @@ ImageAnalyzer.prototype.cropper = function () {
 
             s.updateBrushView();
 
-            if (s.croppedCanvas != undefined)
-                $('#download').attr('href', s.croppedCanvas.toDataURL('image/jpeg'));
         },
         'zoom.cropper': function (e) {
             s.cropBoxSize('get');
@@ -209,7 +314,10 @@ ImageAnalyzer.prototype.cropper = function () {
         }
     }).cropper(options);
 
-    s.freeze();
+    s.selectedRender.cropper("replace", s.renders['renders'][0][gallerySourceURIKey]);
+    s.renderUID = s.renders['renders'][0][galleryUIDKey];
+    s.initializeReconstCanvas();
+    s.cleanseDetectionBtnProceed();
 };
 
 ImageAnalyzer.prototype.cropBoxSize = function (param, event) {
@@ -224,14 +332,14 @@ ImageAnalyzer.prototype.cropBoxSize = function (param, event) {
         var height = (s.cropperCanvas.height() * s.selectionThreshold) / s.selectedRender[0].naturalHeight;
 
         switch (param) {
-            case 'init' :
+            case 'init':
                 realTimeCropBoxData.width = width;
                 realTimeCropBoxData.height = height;
                 realTimeCropBoxData.left = (s.cropperCanvas.width() - width) / 2;
                 realTimeCropBoxData.top = (s.cropperCanvas.height() - height) / 2;
                 s.modifyCropBox = true;
                 break;
-            case 'set' :
+            case 'set':
                 if (event.width >= s.selectionThreshold + 0.5) {
                     var leftDecreasing = realTimeCropBoxData.left < s.oldCropBoxData.left;
                     var widthIncreasing = s.oldCropBoxData.width < realTimeCropBoxData.width;
@@ -290,6 +398,7 @@ ImageAnalyzer.prototype.updateBrushView = function () {
     var selectorAlertText;
     // If Canvas is not transparent
     if (canvasFirstPixel.data[3] != 0) {
+        // if (s.croppedCanvas.toDataURL() != document.getElementById('blank').toDataURL()) {
         $(s.croppedCanvas).attr('id', 'cropper-canvas');
         cropperCanvasContainer.html(s.croppedCanvas);
 
@@ -300,12 +409,15 @@ ImageAnalyzer.prototype.updateBrushView = function () {
         $('#indicator-svg').attr('width', $(s.croppedCanvas).width());
         $('#indicator-svg').attr('height', $(s.croppedCanvas).height());
 
-
         var setPrecision = function (from, to) {
             $(to).val($(from).val());
-            s.ratioThreshold = $(from).val();
+            s.ratioThreshold = 11 - $(from).val();
             if (isFrozen) {
-                s.outlierPixels = [];
+                for (var i = s.outlierPixels.length - 1; i >= 0; i--) {
+                    if (s.outlierPixels[i].autoDetected == true) {
+                        s.outlierPixels.splice(i, 1);
+                    }
+                }
                 s.autoDetectFireflies();
             }
         };
@@ -338,7 +450,7 @@ ImageAnalyzer.prototype.updateBrushView = function () {
         }
 
         // Update HTML elements.
-        $('#analyzer-region').fadeIn( 350, 'linear' );
+        $('#analyzer-region').fadeIn(350, 'linear');
 
         $('#region-alert').addClass('alert-success').removeClass('alert-danger');
         selectorAlertText = "<p> </p>The cropbox is limited to <strong>" + s.selectionThreshold + "x" + s.selectionThreshold + "</strong> pixels which should be sufficient for most analyses. When you are satisfied with your selection, you can proceed with detection.";
@@ -349,7 +461,11 @@ ImageAnalyzer.prototype.updateBrushView = function () {
         cropperCanvasContainer.html('');
 
         // // Update HTML elements.
-        $('#analyzer-region').fadeOut( 350, 'linear' );
+        $('#analyzer-region').fadeOut(350, 'linear', function () {
+            $('html, body').animate({
+                scrollTop: $("#render-region").offset().top
+            }, 200);
+        });
 
         $('#region-alert').addClass('alert-danger').removeClass('alert-success');
 
@@ -359,81 +475,208 @@ ImageAnalyzer.prototype.updateBrushView = function () {
     }
 };
 
-ImageAnalyzer.prototype.freeze = function () {
+ImageAnalyzer.prototype.cleanseDetectionBtnProceed = function () {
     var s = this;
 
-    var finalizeButton = $('#finalize-selection');
-    finalizeButton.click(function () {
-        if (!isFrozen) {
+    var cleanseDetectionButton = $('#cleanse-detection');
+    s.manualDetectFireflies();
+
+    var popOptCleanse = {
+        title: 'Auto Cleanse',
+        content: 'Cleanses each patch automatically. Useful for quick touch-ups.',
+        trigger: 'hover',
+        container: 'body',
+        placement: 'auto top'
+    };
+
+    var popOptDiscard = {
+        title: 'Discard Detection',
+        content: 'Will preserve your modifications, and allow you to select another region for further analysis and editing. However all of your manual selections will be lost.',
+        trigger: 'hover',
+        container: 'body',
+        placement: 'top'
+    };
+    setPopover(cleanseDetectionButton, popOptCleanse);
+
+    cleanseDetectionButton.click(function () {
+        if (!s.isServer) {
+            $('.download-reset').fadeIn(350, 'linear');
+            s.refreshData();
+            s.autoDetectFireflies();
+        }
+        else if (!isFrozen) {
             isFrozen = true;
 
             // Freeze cropper
             s.selectedRender.cropper('disable');
 
-            $('#slider-outer').fadeIn( 350, 'linear' );
+            $('#slider-outer').fadeIn(350, 'linear');
 
             // Update UI
-            finalizeButton.text('Discard Detection');
-            finalizeButton.addClass('btn-danger').removeClass('btn-success');
+            cleanseDetectionButton.text('Discard Outlier Detection');
+            cleanseDetectionButton.addClass('btn-danger').removeClass('btn-success');
+            setPopover(cleanseDetectionButton, popOptDiscard);
 
             $('#render-region').addClass('is-frozen');
             $('#gallery-region').addClass('is-frozen');
-            $( ".thumbnail" ).each(function( index ) {
-                $( this ).addClass('is-frozen');
-            });
-            $('#is-frozen-message').fadeIn( 350, 'linear',  function() {
-                $('html, body').animate({
-                    scrollTop: $("#analyzer-region").offset().top
-                }, 200);
+            $(".thumbnail").each(function (index) {
+                $(this).addClass('is-frozen');
             });
 
+            $('html, body').animate({
+                scrollTop: $("#analyzer-region").offset().top
+            }, 200);
 
             s.autoDetectFireflies();
 
             // Binds an event listener to #selector-container
-            s.manualDetectFireflies();
+            if (s.isServer)
+                s.manualDetectFireflies();
         }
         else if (isFrozen)
-            Confirm.show('Discard Detection', 'All of your manual changes will be discarded. <br>Are you sure you want to proceed?', {
-                'Discard': {
-                    'primary': true,
-                    'callback': function () {
+            s.cleanseDetectionBtnDiscard();
 
-                        // Unfreeze cropper
-                        s.selectedRender.cropper('enable');
-
-                        $('#slider-outer').fadeOut( 350, 'linear' );
-
-                        // Update UI
-                        finalizeButton.text('Begin Detection');
-                        finalizeButton.addClass('btn-success').removeClass('btn-danger');
-
-                        $('#render-region').removeClass('is-frozen');
-                        $('#gallery-region').removeClass('is-frozen');
-                        $( ".thumbnail" ).each(function( index ) {
-                            $( this ).removeClass('is-frozen');
-                        });
-                        
-                        $('#is-frozen-message').fadeOut( 350, 'linear',  function() {
-                            $('html, body').animate({
-                                scrollTop: $("#render-region").offset().top
-                            }, 200);
-                        });
-
-
-                        // Unbinds an event listener from #selector-container
-                        $('#indicator-outer').off("click");
-
-                        // Remove all previously selected pixels
-                        s.outlierPixels = [];
-                        s.drawFireflyIndicators();
-                        isFrozen = false;
-                        Confirm.hide();
-                    }
-                }
-            });
         // If else end
     });
+};
+
+ImageAnalyzer.prototype.cleanseDetectionBtnDiscard = function (cmd) {
+    var s = this;
+    var cleanseDetectionButton = $('#cleanse-detection');
+
+    var popOptBegin = {
+        title: 'Begins Detection',
+        content: 'All controls above this region will be locked to prevent loss of data.',
+        trigger: 'hover',
+        container: 'body',
+        placement: 'auto top'
+    };
+
+    var popOptCleanse = {
+        title: 'Auto Cleanse',
+        content: 'Cleanses each patch automatically. Useful for quick touch-ups.',
+        trigger: 'hover',
+        container: 'body',
+        placement: 'auto top'
+    };
+
+    Confirm.show('Discard Detection', 'All of your manual changes will be discarded. <br>Are you sure you want to proceed?', {
+        'Discard': {
+            'primary': true,
+            'callback': function () {
+
+                // Unfreeze cropper
+                s.selectedRender.cropper('enable');
+
+                // $('#slider-outer').fadeOut(350, 'linear');
+
+                // Update UI
+                cleanseDetectionButton.addClass('btn-success').removeClass('btn-danger');
+
+                $('#render-region').removeClass('is-frozen');
+                $('#gallery-region').removeClass('is-frozen');
+                $(".thumbnail").each(function (index) {
+                    $(this).removeClass('is-frozen');
+                });
+
+                $('#paths-chart-container').fadeOut(350, 'linear');
+                $('#samples-chart-container').fadeOut(350, 'linear');
+                $('#reconstruct-server-container').fadeOut(350, 'linear');
+
+                $('html, body').animate({
+                    scrollTop: $("#render-region").offset().top
+                }, 200);
+
+                if (cmd = 'user-pp') {
+                    cleanseDetectionButton.text('Auto Cleanse');
+                    s.refreshData();
+                    setPopover(cleanseDetectionButton, popOptCleanse);
+                }
+                else {
+                    cleanseDetectionButton.text('Begin Outlier Detection');
+                    setPopover(cleanseDetectionButton, popOptBegin);
+                    s.updateCleanseAlert('server');
+
+                    s.refreshData();
+                }
+
+                // Unbinds an event listener from #selector-container
+                if (s.isServer)
+                    $('#indicator-outer').off("click");
+
+                // Remove all previously selected pixels
+                s.drawFireflyIndicators();
+                isFrozen = false;
+                Confirm.hide();
+            }
+        }
+    });
+};
+
+ImageAnalyzer.prototype.updateCleanseAlert = function (param) {
+    var selector = $('#finalize-freeze-alert');
+    var pixelCountText;
+    if (param == 'server') {
+        pixelCountText = "This step is <strong>necessary</strong>. Once the detection process is initiated, your cropbox will be analyzed for fireflies. Furthermore you can manually select fireflies.";
+        selector.html(pixelCountText);
+    }
+    else if (param == 'user') {
+        pixelCountText = "Double click on any pixel to blend it with its neighbours, or click on <strong>Auto Cleanse</strong> to quickly clean this patch. Move the cropbox on top to update the view.";
+        selector.html(pixelCountText);
+    }
+    else {
+        pixelCountText = "<strong>" + param + "</strong> outlier pixels were automatically detected. Try selecting pixels manually by clicking on them on the left.";
+        selector.html(pixelCountText);
+    }
+}
+
+ImageAnalyzer.prototype.getPixelNeighbours = function (i, _pixelData) {
+    var s = this;
+    var pixelData;
+
+    var canvasW = s.croppedCanvas.getAttribute('width');
+    var canvasH = s.croppedCanvas.getAttribute('height');
+
+    if (!_pixelData) {
+        pixelData = s.croppedCanvas.getContext('2d').getImageData(0, 0, canvasW, canvasH);
+        pixelData = pixelData.data;
+    }
+    else {
+        pixelData = _pixelData;
+    }
+
+    var results;
+
+    var row = canvasW * 4;
+
+    var isLeft = i % row == 0;
+    var isRight = (i + 3) % row == 11;
+    var isTop = (i - row) <= 0;
+    var isBottom = i + row >= pixelData.length;
+    if (!isLeft && !isRight && !isTop && !isBottom) {
+        results = {}
+        var r = i,
+            g = i + 1,
+            b = i + 2;
+        var redAverage =
+            pixelData[r - row - 4] + pixelData[r - row] + pixelData[r - row + 4] +
+            pixelData[r - 4] + pixelData[r + 4] +
+            pixelData[r + row - 4] + pixelData[r + row] + pixelData[r + row + 4];
+        var greenAverage =
+            pixelData[g - row - 4] + pixelData[g - row] + pixelData[g - row + 4] +
+            pixelData[g - 4] + pixelData[g + 4] +
+            pixelData[g + row - 4] + pixelData[g + row] + pixelData[g + row + 4];
+        var blueAverage =
+            pixelData[b - row - 4] + pixelData[b - row] + pixelData[b - row + 4] +
+            pixelData[b - 4] + pixelData[b + 4] +
+            pixelData[b + row - 4] + pixelData[b + row] + pixelData[b + row + 4];
+
+        results.redAverage = redAverage / 8;
+        results.greenAverage = greenAverage / 8;
+        results.blueAverage = greenAverage / 8;
+    }
+
+    return results;
 };
 
 ImageAnalyzer.prototype.autoDetectFireflies = function (s) {
@@ -448,48 +691,29 @@ ImageAnalyzer.prototype.autoDetectFireflies = function (s) {
 
     var row = canvasW * 4;
     for (var i = 0; i < pixelData.length; i += 4) {
-        var isLeft = i % row == 0;
-        var isRight = (i + 3) % row == 11;
-        var isTop = (i - row) <= 0;
-        var isBottom = i + row >= pixelData.length;
-        if (!isLeft && !isRight && !isTop && !isBottom) {
-            var r = i, g = i + 1, b = i + 2;
-            var redAverage =
-                pixelData[r - row - 4] + pixelData[r - row] + pixelData[r - row + 4] +
-                pixelData[r - 4] + pixelData[r + 4] +
-                pixelData[r + row - 4] + pixelData[r + row] + pixelData[r + row + 4];
-            var greenAverage =
-                pixelData[g - row - 4] + pixelData[g - row] + pixelData[g - row + 4] +
-                pixelData[g - 4] + pixelData[g + 4] +
-                pixelData[g + row - 4] + pixelData[g + row] + pixelData[g + row + 4];
-            var blueAverage =
-                pixelData[b - row - 4] + pixelData[b - row] + pixelData[b - row + 4] +
-                pixelData[b - 4] + pixelData[b + 4] +
-                pixelData[b + row - 4] + pixelData[b + row] + pixelData[b + row + 4];
-
-            redAverage /= 8;
-            greenAverage /= 8;
-            blueAverage /= 8;
-
+        var results = s.getPixelNeighbours(i, pixelData);
+        if (results != undefined) {
             var firefly =
-                pixelData[i] / redAverage >= s.ratioThreshold &&
-                pixelData[i + 1] / greenAverage >= s.ratioThreshold &&
-                pixelData[i + 2] / blueAverage >= s.ratioThreshold;
+                pixelData[i] / results.redAverage >= s.ratioThreshold &&
+                pixelData[i + 1] / results.greenAverage >= s.ratioThreshold &&
+                pixelData[i + 2] / results.blueAverage >= s.ratioThreshold;
             if (firefly) {
                 var mainIndex = i / 4;
                 var event = {};
                 event.x = mainIndex % canvasW;
                 event.y = Math.floor(mainIndex / canvasW);
-                s.getFirefly(event, s);
+                s.getFirefly(event, s, results);
             }
         }
-
     }
 
-    var pixelCountText = "<strong>" + s.outlierPixels.length + "</strong> outlier pixels were automatically detected.";
-    $('#finalize-freeze-alert').html(pixelCountText);
+    s.updateCleanseAlert(s.outlierPixels.length);
 
     s.drawFireflyIndicators();
+
+    if (!s.isServer) {
+        s.updateReconstCanvasCropper();
+    }
 };
 
 ImageAnalyzer.prototype.manualDetectFireflies = function () {
@@ -497,10 +721,13 @@ ImageAnalyzer.prototype.manualDetectFireflies = function () {
 
     $('#indicator-outer').click(function (event) {
         s.getFirefly(event, s);
+        if (!s.isServer) {
+            s.updateReconstCanvasCropper();
+        }
     });
 };
 
-ImageAnalyzer.prototype.getFirefly = function (event, s) {
+ImageAnalyzer.prototype.getFirefly = function (event, s, neighbourPixels) {
     var cropData = s.selectedRender.cropper('getData');
     var cropCanvas = d3.select("#cropper-canvas");
     var cropCanvasBounds = cropCanvas.node().getBoundingClientRect();
@@ -534,6 +761,14 @@ ImageAnalyzer.prototype.getFirefly = function (event, s) {
         y = cdY + event.y;
     }
 
+    var canvasW = s.croppedCanvas.getAttribute('width');
+    var mainIndex = (y - cdY) * canvasW;
+    mainIndex += (x - cdX);
+    mainIndex *= 4;
+
+    if (event.target)
+        neighbourPixels = s.getPixelNeighbours(mainIndex);
+
     var pixelRGBA = s.croppedCanvas.getContext('2d').getImageData(x - cdX, y - cdY, 1, 1);
 
     var currentPixel = {};
@@ -547,7 +782,14 @@ ImageAnalyzer.prototype.getFirefly = function (event, s) {
     currentPixel.colorG = pixelRGBA.data[1];
     currentPixel.colorB = pixelRGBA.data[2];
     currentPixel.colorA = pixelRGBA.data[3];
+    currentPixel.averageR = neighbourPixels.redAverage;
+    currentPixel.averageG = neighbourPixels.greenAverage;
+    currentPixel.averageB = neighbourPixels.blueAverage;
     currentPixel.selected = false;
+    if (event.target)
+        currentPixel.autoDetected = false;
+    else
+        currentPixel.autoDetected = true;
 
     var index = s.outlierPixels.findIndex(function (element) {
         return element.key == currentPixel.key;
@@ -561,6 +803,10 @@ ImageAnalyzer.prototype.getFirefly = function (event, s) {
 
     if (event.target) {
         s.drawFireflyIndicators();
+    }
+
+    if (!s.isServer) {
+        s.updateReconstCanvas(currentPixel);
     }
 };
 
@@ -580,6 +826,15 @@ ImageAnalyzer.prototype.drawFireflyIndicators = function (s) {
 
     circles = circles.merge(circlesEnter);
 
+    d3.selectAll('.d3-tip-firefly').remove();
+
+    var tip = d3.tip().attr('class', 'd3-tip d3-tip-firefly').html(function (d) {
+        return '<strong>Row: </strong>' + d.x +
+            '&emsp;<strong>Column: </strong>' + d.y;
+    });
+    tip.offset([-7, 0]);
+    circles.call(tip);
+
     circles
         .attr('cx', function (d) {
             return d.offsetX;
@@ -591,27 +846,92 @@ ImageAnalyzer.prototype.drawFireflyIndicators = function (s) {
             return d.ratio / 2;
         })
         .on('click', function (d, i) {
-            if (s.previousSelection != -1 && s.outlierPixels[s.previousSelection] != undefined) {
-                s.outlierPixels[s.previousSelection].selected = false;
-                d3.select('.selector-current').classed('selector-current', false);
+            if (s.isServer) {
+                if (s.previousSelection != -1 && s.outlierPixels[s.previousSelection] != undefined) {
+                    s.outlierPixels[s.previousSelection].selected = false;
+                    d3.select('.selector-current').classed('selector-current', false);
+                }
+                s.previousSelection = i;
+                d3.select(this).classed('selector-current', true);
+                s.updateSamplesChart(d);
             }
-            s.previousSelection = i;
-            d3.select(this).classed('selector-current', true);
-            s.updateSamplesChart(d);
-            $('html, body').animate({
-                scrollTop: $("#samples-region").offset().top
-            }, 200);
+            else {
+                s.outlierPixels.splice(i, 1);
+                d3.select(this).remove();
+                tip.hide(d);
+                d3.event.stopPropagation();
+            }
         })
         .on('contextmenu', function (d, i) {
             s.outlierPixels.splice(i, 1);
             d3.select(this).remove();
-            // return false;
+            tip.hide(d);
+            return false;
+        })
+        .on('mouseover', tip.show)
+        .on('mouseout', tip.hide);
+};
+
+ImageAnalyzer.prototype.initializeReconstCanvas = function (reset) {
+    var s = this;
+    $('#reconst-canvas').remove();
+    $("#reconst-outer").append('<canvas id="reconst-canvas"></canvas>');
+
+    if (reset) {
+        s.reconstCanvas = $('#reconst-canvas')[0];
+        s.reconstCanvas.width = s.selectedRender[0].naturalWidth;
+        s.reconstCanvas.height = s.selectedRender[0].naturalHeight;
+        var myContext = s.reconstCanvas.getContext("2d");
+        myContext.drawImage(s.selectedRender[0], 0, 0);
+    }
+    else {
+        $('#render-image').on('load', function () {
+            s.reconstCanvas = $('#reconst-canvas')[0];
+            s.reconstCanvas.width = s.selectedRender[0].naturalWidth;
+            s.reconstCanvas.height = s.selectedRender[0].naturalHeight;
+            var myContext = s.reconstCanvas.getContext("2d");
+            myContext.drawImage(s.selectedRender[0], 0, 0);
         });
+    }
+};
+
+ImageAnalyzer.prototype.updateReconstCanvas = function (pixel) {
+    var s = this;
+    var myContext = s.reconstCanvas.getContext("2d");
+    var id = myContext.createImageData(1, 1);
+    var d = id.data;
+    d[0] = pixel.averageR;
+    d[1] = pixel.averageG;
+    d[2] = pixel.averageB;
+    d[3] = 255;
+    myContext.putImageData(id, pixel.x, pixel.y);
+};
+
+ImageAnalyzer.prototype.updateReconstCanvasCropper = function () {
+    var s = this;
+    s.reconstCanvas.toBlob(function (blob) {
+        var url = URL.createObjectURL(blob);
+        $('.cropper-canvas > img').attr('src', url);
+        $('.cropper-view-box > img').attr('src', url);
+        $('#download-image-link').attr('href', url);
+    }, "image/jpeg", 0.95);
+
+};
+
+ImageAnalyzer.prototype.resetReconstCanvas = function () {
+    var s = this;
+    s.initializeReconstCanvas(true);
+    s.updateReconstCanvasCropper();
+};
+
+ImageAnalyzer.prototype.refreshData = function () {
+    var s = this;
+    $('#indicator-svg').empty();
+    s.outlierPixels = [];
+    userModifications = userModificationsDefault;
 };
 
 ImageAnalyzer.prototype.updateSamplesChart = function (pixel) {
     var s = this;
-    console.log('User selected pixel: ', pixel.x, pixel.y);
-    console.log('Sending pixel identity to samplesChart');
     s.samplesChart.getData(pixel);
 };

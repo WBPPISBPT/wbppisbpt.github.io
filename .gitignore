@@ -4,3 +4,6 @@ website/.idea/*
 website/.idea/
 .idea/*
 .idea/
+data/paths-json
+data/samples-json
+data/data

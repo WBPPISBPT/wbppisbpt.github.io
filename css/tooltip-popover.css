@@ -1,0 +1,86 @@
+.popover.top> .arrow:after {
+    border-top-color: #222222;
+}
+.popover.left> .arrow:after {
+    border-left-color: #222222;
+}
+.popover.right> .arrow:after {
+    border-right-color: #222222;
+}
+.popover.bottom> .arrow:after {
+    border-bottom-color: #222222;
+}
+.popover {
+    color: white;
+    background: #222222;
+    border-color: #525252;
+}
+.popover-title {
+    color: white;
+    background: #222222;
+    border-color: #525252;
+    font-weight: bold;
+}
+.popover-content {
+    color: white;
+    background: #222222;
+    border-color: #525252;
+    font-size: 14px;
+}
+
+.d3-tip {
+    line-height: 1;
+    padding: 12px;
+    background: #222222;
+    color: #fff;
+    pointer-events: none;
+    border-radius: 6px;
+    -webkit-box-shadow: 0 5px 10px rgba(0, 0, 0, .2);
+    box-shadow: 0 5px 10px rgba(0, 0, 0, .2);
+}
+
+/* Creates a small triangle extender for the tooltip */
+.d3-tip:after {
+    box-sizing: border-box;
+    display: inline;
+    font-size: 10px;
+    width: 100%;
+    line-height: 1;
+    color: #222222;
+    position: absolute;
+    pointer-events: none;
+}
+
+/* Northward tooltips */
+.d3-tip.n:after {
+    content: "\25BC";
+    margin: -1px 0 0 0;
+    top: 100%;
+    left: 0;
+    text-align: center;
+}
+
+/* Eastward tooltips */
+.d3-tip.e:after {
+    content: "\25C0";
+    margin: -4px 0 0 0;
+    top: 50%;
+    left: -8px;
+}
+
+/* Southward tooltips */
+.d3-tip.s:after {
+    content: "\25B2";
+    margin: 0 0 1px 0;
+    top: -8px;
+    left: 0;
+    text-align: center;
+}
+
+/* Westward tooltips */
+.d3-tip.w:after {
+    content: "\25B6";
+    margin: -4px 0 0 -1px;
+    top: 50%;
+    left: 100%;
+}

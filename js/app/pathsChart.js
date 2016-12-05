@@ -1,12 +1,16 @@
+var pathsQuery = 'paths-json/';
 var pathUIDKey = "uid";
-var pathFinalContribKey = "fin_contrib";
+var pathFinalContribKey = "weight";
+var pathRKey = "r";
+var pathGKey = "g";
+var pathBKey = "b";
 var pathThroughputKey = "throuput";
 var pathTotalProbabilityKey = "tot_prob";
 var pathVerticesKey = "vertices";
 var vertexObjNameKey = "obj_name";
-var vertexMatNameKey = "mat_name";
-var vertexMatTypeKey = "mat_type";
-var vertexProbKey = "prob";
+var vertexRKey = "r";
+var vertexGKey = "g";
+var vertexBKey = "b";
 
 /**
  * Constructor for the SamplesChart
@@ -17,6 +21,7 @@ function PathsChart() {
     var self = this;
     self.init();
 }
+
 /**
  * Initializes the svg elements required for this chart
  */
@@ -26,86 +31,48 @@ PathsChart.prototype.init = function () {
     self.pathsOrig;
     self.paths;
     self.modified = false;
-
-
+    self.maxVertexPerLine = 15;
+    self.vertexLineDistance = 60;
+    self.vertexRadius = 10;
+    self.strokeWidth = 3;
+    self.vertexPerLine = 10;
     //Gets access to the div element created for this chart from HTML
     self.divOuter = d3.select("#paths-chart-container");
     self.table = d3.select(".paths-table");
     self.tableBody = d3.select(".paths-table-body");
-
     $('#paths-chart-container').hide();
 };
-
 
 PathsChart.prototype.getData = function (_sample) {
     var self = this;
     if (self.sample == undefined || self.sample[sampleUIDKey] != _sample[sampleUIDKey]) {
-
         self.sample = _sample;
         self.modified = false;
-
-        console.log('PathsChart.getData called.');
-        console.log('SampleUID: ', _sample[sampleUIDKey]);
+        var filename = _sample.uid.replace('S', 'P') + '.json';
         // Get the paths data and update the chart
         if (demo) {
             var string;
             Math.random() > 0.5 ? string = "data/paths.json" : string = "data/paths2.json";
             d3.json(string, function (error, _paths) {
-                $('#paths-chart-container').show();
-                console.log('PathsChart.getData received data: ', _paths);
+                $('#paths-chart-container').fadeIn(350, 'linear', function () {
+                    $('html, body').animate({
+                        scrollTop: $("#paths-chart-container").offset().top
+                    }, 200);
+                });
                 self.pathsOrig = _paths['paths'];
                 // self.pixelInfo();
                 self.update();
             });
-        } else {
-
-            $('#paths-chart-container').show();
-            $('.wait2').show();
-
-            let query = {
-                "sampleID": _sample[sampleUIDKey]
-            };
-
-            let send_data = {
-                "query_string": JSON.stringify(query)
-            };
-
-            $.ajax({
-                type: "GET",
-                url: database_URI + '/getFromCollection/SamplePaths',
-                success: function (data, textStatus, jqXHR) {
-                    console.log(textStatus)
-                    console.log("Got sample paths for ID", _sample[sampleUIDKey]);
-                    console.log(data);
-
-
-                    self.pathsOrig = data;
-                    $('.wait2').hide();
-                    self.update();
-
-                    /*
-                    results = [];
-                    data.forEach(function(d){
-                        results.push({
-                            fin_contrib: Math.sqrt(d.value.r*d.value.r + d.value.g*d.value.g + d.value.b*d.value.b),
-                            uid: d.uid,
-                            r: d.value.r,
-                            g: d.value.g,
-                            b: d.value.b
-                        });
-                    });
-
-                    console.log("Samples results")
-                    console.log(results)
-
-                    */
-                },
-                error: function (jqXHR, textStatus, errorThrown) {
-                    console.log(textStatus);
-                    console.log(jqXHR);
-                    console.log(errorThrown);
-                },
-                data: send_data
+        }
+        else {
+            d3.json(server + pathsQuery + filename, function (error, _paths) {
+                $('#paths-chart-container').fadeIn(350, 'linear', function () {
+                    $('html, body').animate({
+                        scrollTop: $("#paths-chart-container").offset().top
+                    }, 200);
+                });
+                self.pathsOrig = _paths['paths'];
+                self.update();
             });
         }
     }
@@ -113,352 +80,246 @@ PathsChart.prototype.getData = function (_sample) {
 
 PathsChart.prototype.update = function () {
     var self = this;
-
+    d3.selectAll('.td-hide-detail').classed('td-hide-detail', false);
+    d3.selectAll('.path-tr-vertex').remove();
+    d3.selectAll('.d3-tip-vertex').remove();
     if (!self.modified)
         self.paths = self.pathsOrig.slice(0);
-
     var trMain = self.tableBody.selectAll('.path-tr-main')
         .data(self.paths);
-
     var trMainEnter = trMain.enter()
         .append('tr')
         .attr('class', 'path-tr-main');
-
     trMain.exit().remove();
     trMain = trMain.merge(trMainEnter);
-
-
-    var tdMain = trMain.selectAll('.path-td-main')
+    self.tdMain = trMain.selectAll('.path-td-main')
         .data(function (d) {
-
-            let val = d.value;
-            let fin_Contr = Math.sqrt(val.r * val.r + val.g * val.g + val.b * val.b);
-
-
-            if (d.sampleType == 'VC') {
-
-                return [
-                    
-                    {
-                        'vis': 'show-detail',
-                        'value': d[pathUIDKey]
-                    },
-                    {
-                        'vis': 'uid',
-                        'value': d[pathUIDKey]
-                    },
-                    {
-                        'vis': 'fin-contrib',
-                        'value': fin_Contr
-                    },
-                //,
-                //{'vis': 'throughput', 'value': d[pathThroughputKey]},
-                //{'vis': 'tot-prob', 'value': d[pathTotalProbabilityKey]},
-                //{'vis': 'edge-count', 'value': d[pathVerticesKey].length},
-                //{'vis': 'tp-d-tp', 'value': d[pathThroughputKey] / d[pathTotalProbabilityKey]},
-                    {
-                        'vis': 'cameraVertices',
-                        'value': d.cameraVertices
-                    },
-                    {
-                        'vis': 'lightVertices',
-                        'value': d.lightVertices
-                    },
-                    {
-                        'vis': 'type',
-                        'value': d.sampleType
-                    }
-                ];
-            }
-
-            return [
-                {
-                    'vis': 'show-detail',
-                    'value': d[pathUIDKey]
-                },
-                {
-                    'vis': 'uid',
-                    'value': d[pathUIDKey]
-                },
-                {
-                    'vis': 'fin-contrib',
-                    'value': fin_Contr
-                },
-                //,
-                //{'vis': 'throughput', 'value': d[pathThroughputKey]},
-                //{'vis': 'tot-prob', 'value': d[pathTotalProbabilityKey]},
-                //{'vis': 'edge-count', 'value': d[pathVerticesKey].length},
-                //{'vis': 'tp-d-tp', 'value': d[pathThroughputKey] / d[pathTotalProbabilityKey]},
-                {
-                    'vis': 'vertices',
-                    'value': d[pathVerticesKey]
-                }
-            ];
+            return [{
+                'vis': 'show-detail',
+                'value': d[pathUIDKey]
+            }, {
+                'vis': pathUIDKey,
+                'value': d[pathUIDKey]
+            }, {
+                'vis': pathFinalContribKey,
+                'value': d[pathFinalContribKey]
+            }, {
+                'vis': pathRKey,
+                'value': d[pathRKey]
+            }, {
+                'vis': pathGKey,
+                'value': d[pathGKey]
+            }, {
+                'vis': pathBKey,
+                'value': d[pathBKey]
+            }, {
+                'vis': 'edge-count',
+                'value': d[pathVerticesKey].length
+            }];
         });
-
-    var tdMainEnter = tdMain.enter()
+    var tdMainEnter = self.tdMain.enter()
         .append('td')
         .attr("class", function (d) {
             return 'path-td-main td-' + d.vis;
         });
-
-    tdMain.exit().remove();
-    tdMain = tdMain.merge(tdMainEnter);
-
-    var finContribData = tdMain.filter(function (d) {
-        return d.vis == 'fin-contrib';
-    });
-
-    var temp = d3.selectAll('.td-fin-contrib');
-    var finContrib = d3.selectAll('.td-fin-contrib')
-        .data(finContribData.data());
-
-    var finContribEnter = finContrib.enter();
-    // .append('p');
-
-    finContrib.exit().remove();
-    finContrib = finContrib.merge(finContribEnter);
-
-    finContrib.text(function (d) {
-        return d.value;
-    });
-
+    self.tdMain.exit().remove();
+    self.tdMain = self.tdMain.merge(tdMainEnter);
+    self.setupEachMainCell('show-detail');
+    self.setupEachMainCell(pathUIDKey);
+    self.setupEachMainCell(pathFinalContribKey);
+    self.setupEachMainCell(pathRKey);
+    self.setupEachMainCell(pathGKey);
+    self.setupEachMainCell(pathBKey);
+    self.setupEachMainCell('edge-count');
 };
 
-
-PathsChart.prototype.setupAxis = function (param) {
+PathsChart.prototype.setupEachMainCell = function (key) {
     var self = this;
-
-    var className;
-    var axisFunction;
-    param == 'y' ? className = 'y-axis' : className = 'x-axis';
-
-    var xAxisScale = d3.scaleLinear()
-        .range([0, self.svgWidth - self.axisWidth - 3]);
-
-    if (param == 'y') {
-        axisFunction = d3.axisLeft();
-        axisFunction.scale(self.yScale);
-    } else {
-        axisFunction = d3.axisBottom();
-        axisFunction.scale(xAxisScale);
-        axisFunction.ticks(0);
-        axisFunction.tickSize(0);
+    var tdData = self.tdMain.filter(function (d) {
+        return d.vis == key;
+    });
+    var td = d3.selectAll('.td-' + key)
+        .data(tdData.data());
+    var tdEnter = td.enter();
+    td.exit().remove();
+    td = td.merge(tdEnter);
+    if (key != 'show-detail') {
+        td.text(function (d) {
+            return d.value;
+        });
     }
-
-    var axis = self.chartSVG.selectAll('.' + className)
-        .data([1]);
-
-    axis.exit().remove();
-
-    var axisEnter = axis.enter()
-        .append("g")
-        .attr("class", className);
-
-    axis = axis.merge(axisEnter);
-
-    axis.call(axisFunction)
-        .attr("transform", function () {
-            if (param == 'y') {
-                return "translate(" + self.axisWidth + ", 10)";
-            } else {
-                var translate = "translate(";
-                translate += self.axisWidth;
-                translate += ", ";
-                translate += (self.svgHeight - self.yScale(self.maxFinContrib) - 10);
-                translate += ")";
-                return translate;
+    else {
+        var popOptShow = {
+            title: 'Show Path Vertices',
+            content: 'Displays objects that the path consists of, in the order of bounces.',
+            trigger: 'hover',
+            container: 'body'
+        };
+        var popOptHide = {
+            title: 'Hide Path Vertices',
+            content: 'Hide the row below which displays path objects.',
+            trigger: 'hover',
+            container: 'body'
+        };
+        td.call(setPopover, popOptShow);
+        td.on('click', function (d, index) {
+            var caller = $(this);
+            if (caller.hasClass("td-hide-detail")) {
+                d3.select('#' + d.value + '-vertex-info').remove();
+                caller.removeClass("td-hide-detail");
+                setPopover(caller, popOptShow);
+            }
+            else {
+                caller.addClass("td-hide-detail");
+                var parentTR = d3.event.target.parentNode;
+                self.setupVertexRow(d.value, index, parentTR);
+                setPopover(caller, popOptHide);
             }
         });
+    }
 };
 
-PathsChart.prototype.setupBars = function () {
+PathsChart.prototype.setupVertexRow = function (uid, index, parentTR) {
     var self = this;
-    var bars = self.chartSVG.selectAll('.bar')
-        .data(self.paths);
-
-    bars.exit().remove()
-        .attr('fill', function (d) {
-            return self.colorScale(d[sampleFinalContribKey]);
-        });
-
-    var barsEnter = bars.enter()
-        .append('rect')
-        .classed('bar', true);
-
-    bars = bars.merge(barsEnter);
-
-    var barWidth = (self.svgWidth - self.axisWidth) / self.paths.length;
-
-    bars
-        .attr("x", function (d) {
-            return self.xScale(d[sampleUIDKey]);
-        })
-        .attr("y", function (d) {
-            return self.yScale(d[sampleFinalContribKey]) + 10;
-        })
-        .attr("width", barWidth - 2)
-        .attr("height", function (d) {
-            return self.svgHeight - self.yScale(d[sampleFinalContribKey]) - 20;
-        })
-        .attr('style', 'cursor: pointer;')
-        .attr('fill', function (d) {
-            return self.colorScale(d[sampleFinalContribKey]);
-        })
-        .on('contextmenu', function (d, i) {
-            if (self.paths.length > 1) {
-                self.modifyData('r', i);
-                self.recordRemovedPixel(d);
-            }
-            return false;
-        });
+    var trID = uid + '-vertex-info';
+    var svgID = uid + '-svg';
+    var eliminateID = uid + '-elim';
+    var pathLength = self.paths[index][pathVerticesKey].length;
+    var eliminateClass = 'path-tr-eliminate';
+    if (userModifications.eliminatedPaths[pathLength]) {
+        eliminateClass += ' checked';
+    }
+    var html =
+        '<tr class="path-tr-vertex" id="' + trID + '">' +
+        '<td colspan="1" ' +
+        'id="' + eliminateID + '" ' +
+        'class="' + eliminateClass + '"' +
+        '" data-path-index="' + index +
+        '" data-path-length="' + pathLength +
+        '"></td>' +
+        '<td colspan="6"><svg id="' + svgID + '"></svg></td>' +
+        '</tr>';
+    if ($('#' + trID).length) {
+        // Row has already been created.
+    }
+    else {
+        $(html).insertAfter($(parentTR));
+        self.setupVertexSVG(index, svgID);
+        self.setupEliminateButton(eliminateID, pathLength);
+    }
 };
-PathsChart.prototype.setupMean = function () {
-    var self = this;
 
-    var mean = d3.mean(self.paths, function (d) {
-        return +d[sampleFinalContribKey];
+PathsChart.prototype.setupEliminateButton = function (eliminateID, _pathLength) {
+    var self = this;
+    var popOptElim = {
+        title: 'Omit Paths of Length ' + _pathLength,
+        content: 'Will omit all paths of length ' + _pathLength + ' from the reconstructed render.',
+        trigger: 'hover',
+        container: 'body'
+    };
+    var popOptRestore = {
+        title: 'Permit Paths of Length ' + _pathLength,
+        content: 'Paths of length ' + _pathLength + ' have been omitted from reconstruction. You can permit these paths by clicking on the this button.',
+        trigger: 'hover',
+        container: 'body'
+    };
+    if (userModifications.eliminatedPaths[_pathLength])
+        setPopover($('#' + eliminateID), popOptRestore);
+    else
+        setPopover($('#' + eliminateID), popOptElim);
+    $('#' + eliminateID).on('click', function (e) {
+        var pathLength = $(this).data('pathLength');
+        var selector = $('[data-path-length="' + pathLength + '"]');
+        if (userModifications.eliminatedPaths[pathLength]) {
+            delete userModifications.eliminatedPaths[pathLength];
+            setPopover(selector, popOptElim);
+            selector.removeClass('checked');
+        }
+        else {
+            userModifications.eliminatedPaths[pathLength] = pathLength;
+            setPopover(selector, popOptRestore);
+            selector.addClass('checked');
+        }
+        updateServerReconstructionRequest();
     });
-
-
-    d3.select('.mean').remove();
-    d3.select('.meanText').remove();
-    console.log(mean);
-
-    var meanBar = self.chartSVG.selectAll('.mean')
-        .data([mean]);
-
-    var meanText = self.chartSVG.selectAll('.meanText')
-        .data([mean]);
-
-    var meanBarWidth = (self.svgWidth - self.axisWidth);
-
-    meanBar.enter()
-        .append('rect')
-        .classed('mean', true)
-        .attr("x", function (d) {
-            return self.axisWidth;
-        })
-        .attr("y", function (d) {
-            return self.yScale(d) + 10;
-        })
-        .attr("width", meanBarWidth - 2)
-        .attr("height", function (d) {
-            return 1;
-        })
-        .attr('fill', 'rgba(0, 0, 0, 0.8)');
-
-    var format = d3.format(".02f");
-
-    meanText.enter()
-        .append('text')
-        .classed('meanText', true)
-        .attr("x", function (d) {
-            return self.axisWidth + 5;
-        })
-        .attr("y", function (d) {
-            return self.yScale(d) + 10;
-        })
-        .text(function (d) {
-            return 'Samples Mean: ' + format(d);
-        })
-        .attr("font-family", "sans-serif")
-        .attr("font-size", "1em")
-        .attr("font-weight", "bold")
-        .attr("alignment-baseline", function (d) {
-            if (d == self.maxFinContrib) {
-                return 'before-edge';
-            }
-            return 'after-edge';
-        })
-        .attr('fill', 'rgba(0, 0, 0, 0.8)');
 };
 
-PathsChart.prototype.recordRemovedPixel = function (d) {
+PathsChart.prototype.setupVertexSVG = function (index, svgID) {
     var self = this;
-    var pixel = self.sample.x + '-' + self.sample.y;
-    if (!removedSamples[pixel]) {
-        removedSamples[pixel] = {};
+    var data = self.paths[index][pathVerticesKey];
+    if (data.length > self.maxVertexPerLine) {
+        self.vertexPerLine = self.maxVertexPerLine;
     }
-    removedSamples[pixel][d[sampleUIDKey]] = d;
+    else {
+        self.vertexPerLine = data.length;
+    }
+    self.maxPossibleLines = Math.floor((data.length - 1) / self.vertexPerLine) + 1;
+    self.vertexSVG = d3.select('#' + svgID);
+    self.vertexSVGParent = self.vertexSVG.node().parentNode;
+    var firstTD = d3.select('.td-show-detail').node();
+    var firstTDWidth = firstTD.getBoundingClientRect().width;
+    var pathTR = d3.select('.path-tr-vertex').node();
+    var pathTRWidth = pathTR.getBoundingClientRect().width;
+    var padding = parseInt($(self.vertexSVGParent).css('padding'));
+    self.svgWidth = pathTRWidth - firstTDWidth - (padding * 2);
+    self.svgHeight = self.maxPossibleLines * self.vertexLineDistance;
+    self.vertexSVG.attr("width", self.svgWidth);
+    self.vertexSVG.attr("height", self.svgHeight);
+    self.setupVertexDisplay(index);
 };
 
-PathsChart.prototype.pixelInfo = function () {
+PathsChart.prototype.setupVertexDisplay = function (index) {
     var self = this;
-
-    function hex(x) {
-        return ("0" + parseInt(x).toString(16)).slice(-2);
+    var data = self.paths[index][pathVerticesKey];
+    var xPosition = d3.scaleLinear()
+        .range([self.vertexRadius, self.svgWidth - self.vertexRadius])
+        .domain([0, self.vertexPerLine - 1]);
+    var yPosition = d3.scaleLinear()
+        .range([self.vertexLineDistance / 2, self.svgHeight - self.vertexLineDistance / 2])
+        .domain([1, self.maxPossibleLines]);
+    for (var i = 1; i <= self.maxPossibleLines; i++) {
+        self.vertexSVG.append('rect')
+            .attr("x", xPosition(0))
+            .attr("y", yPosition(i) - (self.strokeWidth / 2))
+            .attr("width", function () {
+                if (i == self.maxPossibleLines) {
+                    return xPosition((data.length - 1) % self.vertexPerLine) - self.vertexRadius;
+                }
+                else {
+                    return self.svgWidth - self.vertexRadius * 2;
+                }
+            })
+            .attr("height", self.strokeWidth);
     }
-
-    function hexToRgb(hex) {
-        var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-        return result ? {
-            r: parseInt(result[1], 16),
-            g: parseInt(result[2], 16),
-            b: parseInt(result[3], 16)
-        } : null;
-    }
-
-    function color(x) {
-        var mid = 255 / 2;
-        if (x.r) {
-            if (x.r >= mid && x.g >= mid && x.b >= mid)
-                return 'black';
-            else
-                return 'white';
-        } else
-            return 'white';
-    }
-
-    $('#pixelX').text('X: ' + self.sample.x);
-    $('#pixelY').text('Y: ' + self.sample.y);
-
-    var pixelColor = "#" + hex(self.sample.colorR) + hex(self.sample.colorG) + hex(self.sample.colorB);
-
-    $('#pixelCol').css("background", pixelColor);
-    $('#pixelCol').css("color", color(hexToRgb(pixelColor)));
-    $('#pixelCol').text(pixelColor.toUpperCase());
-
-    $('#pixelRed').css("background", "rgba(" + self.sample.colorR + ", 0, 0, 1)");
-    $('#pixelRed').text('R:' + self.sample.colorR);
-    $('#pixelRed').css("color", color(self.sample.colorR));
-
-    $('#pixelGreen').css("background", "rgba(0," + self.sample.colorG + ", 0, 1)");
-    $('#pixelGreen').text('G:' + self.sample.colorG);
-    $('#pixelGreen').css("color", color(self.sample.colorG));
-
-    $('#pixelBlue').css("background", "rgba(0, 0," + self.sample.colorB + ", 1)");
-    $('#pixelBlue').text('B:' + self.sample.colorB);
-    $('#pixelBlue').css("color", color(self.sample.colorB));
-};
-
-PathsChart.prototype.modifyData = function (param, index) {
-    // sr: sort reset
-    // sa: sort ascending
-    // sd: sort descending
-    // r: remove element
-    var self = this;
-    switch (param) {
-        case 'sr':
-            self.modified = false;
-            self.paths = self.pathsOrig.slice(0);
-            break;
-        case 'sa':
-            self.modified = true;
-            self.paths = self.paths.sort(function (a, b) {
-                return d3.ascending(a[sampleFinalContribKey], b[sampleFinalContribKey]);
-            });
-            break;
-        case 'sd':
-            self.modified = true;
-            self.paths = self.paths.sort(function (a, b) {
-                return d3.descending(a[sampleFinalContribKey], b[sampleFinalContribKey]);
-            });
-            break;
-        case 'r':
-            self.modified = true;
-            self.paths.splice(index, 1);
-            break;
-    }
-    self.update();
+    var vertices = self.vertexSVG.selectAll("circle")
+        .data(data);
+    vertices.exit().remove();
+    var verticesEnter = vertices.enter()
+        .append("circle")
+        .classed("vertex-circle", true);
+    vertices = vertices.merge(verticesEnter);
+    var tip = d3.tip().attr('class', 'd3-tip d3-tip-vertex').html(function (d) {
+        return '<strong>ID: </strong>' + d[vertexObjNameKey] + '<br>' +
+            '<strong>R: </strong>' + d[vertexRKey] + '<br>' +
+            '<strong>G: </strong>' + d[vertexGKey] + '<br>' +
+            '<strong>B: </strong>' + d[vertexBKey];
+    });
+    tip.offset([-7, 0]);
+    vertices.call(tip);
+    vertices
+        .attr('cx', function (d, i) {
+            return xPosition(i % self.vertexPerLine);
+        })
+        .attr('cy', function (d, i) {
+            var lineIdentifier = Math.floor(i / self.vertexPerLine) + 1;
+            return yPosition(lineIdentifier);
+        })
+        .attr('r', function (d) {
+            return self.vertexRadius - self.strokeWidth;
+        })
+        .attr('fill', 'white')
+        .attr('stroke', 'black')
+        .attr('stroke-width', self.strokeWidth)
+        .on('mouseover', tip.show)
+        .on('mouseout', tip.hide);
 };

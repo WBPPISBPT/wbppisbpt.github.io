@@ -1,12 +1,83 @@
-
-//var database_URI = "http://localhost:8000";
-var database_URI = "http://cs6630.sci.utah.edu:8000";
-
-
 var demo = false;
+var server = "data/";
+var serverSend = "";
+var rendersQuery = '';
 var isFrozen = false;
-var removedSamples = {};
+var userModificationsDefault = {
+    removedSamples: {},
+    eliminatedPaths: {}
+};
+var userModifications = {
+    removedSamples: {},
+    eliminatedPaths: {}
+};
 
+function setPopover(element, options) {
+    if (element.nodes) {
+        $(element.nodes()).each(function () {
+            if ($(this).data('bs.popover')) {
+                $(this).data('bs.popover').options.title = options.title;
+                $(this).data('bs.popover').options.content = options.content;
+            }
+            else {
+                $(this).attr('data-toggle', 'popover');
+                $(this).popover(options);
+            }
+        });
+    }
+    else {
+        if (element.data('bs.popover')) {
+            element.data('bs.popover').options.title = options.title;
+            element.data('bs.popover').options.content = options.content;
+        }
+        else {
+            element.attr('data-toggle', 'popover');
+            element.popover(options);
+        }
+    }
+};
+
+function updateServerReconstructionRequest() {
+    if (Object.keys(userModifications.eliminatedPaths).length == 0 && Object.keys(userModifications.removedSamples).length == 0){
+        $('#send-to-server').fadeOut(350, 'linear');
+    }
+    else{
+        $('#send-to-server').fadeIn(350, 'linear');
+    }
+
+    var samplesHTML = '';
+    var pathsHTML = '';
+
+    var s = userModifications.removedSamples;
+    var p = userModifications.eliminatedPaths;
+    console.log(userModifications.eliminatedPaths)
+    for (var key in s) {
+        if (s.hasOwnProperty(key)) {
+            for (var subKey in s[key]) {
+                if (s[key].hasOwnProperty(subKey)) {
+                    samplesHTML = samplesHTML + s[key][subKey][sampleUIDKey] + '<br>';
+                }
+            }
+        }
+    }
+
+    for (var key in p) {
+        if (p.hasOwnProperty(key)) {
+            pathsHTML = pathsHTML + p[key] + '<br>';
+        }
+    }
+
+    $('#sample-recont-cmd').html(samplesHTML);
+    $('#path-recont-cmd').html(pathsHTML);
+}
+
+$('.close-img').on('click', function () {
+   $('.about').fadeOut(350, 'linear');
+});
+
+$('.open-about').on('click', function () {
+    $('.about').fadeIn(350, 'linear');
+});
 
 /*
  * Root file that handles instances of all the charts, image analyzer and loads the visualization
@@ -44,150 +115,51 @@ var removedSamples = {};
     //     }
     // });
 
-    function UpdateRenderCanvas(data) {
-        let canvas = d3.select('#renderCanvas');
-        console.log(data);
-
-        canvas.attr('width', data.width);
-        canvas.attr('height', data.height);
-
-        let context = canvas.node().getContext("2d");
-
-        let imgData = context.createImageData(data.width, data.height);
-
-        let imgSize = data.width * data.height;
-
-        for (var i = 0; i < imgSize; i++) {
-            imgData.data[4 * i + 0] = data.data_r[i] * 255;
-            imgData.data[4 * i + 1] = data.data_g[i] * 255;
-            imgData.data[4 * i + 2] = data.data_b[i] * 255;
-            imgData.data[4 * i + 3] = 255;
-        }
-
-        //console.log(imgData)
-
-        context.putImageData(imgData, 0, 0);
-        //         console.log($('#renderCanvas'));
-        //         $('#render-image').attr('src', document.getElementById('renderCanvas').toDataURL('image/jpeg'));
-    }
-
-    function GetPixelSampleValue(i, j) {
-        let results = [];
-
-        var query = {
-            "pixel_i": i,
-            "pixel_j": j
-        };
-
-        var send_data = {
-            "query_string": JSON.stringify(query)
-        };
-
-        $.ajax({
-            type: "GET"
-                //type: "POST"
-                //crossDomain : true,
-                //cache: false,
-                //url: database_URI + '/getFromCollection/Cameras',
-                ,
-            url: database_URI + '/getFromCollection/OriginalCameraPaths'
-                //data: data,
-                ,
-            success: function (data, textStatus, jqXHR) {
-                console.log(textStatus)
-                console.log(data)
-
-
-
-            },
-            error: function (jqXHR, textStatus, errorThrown) {
-                console.log(textStatus);
-                console.log(jqXHR);
-                console.log(errorThrown);
-            }
-
-            // The query.
-            //, data: query
-
-            ,
-            data: send_data
-
-            //, dataType: "json"
-            //dataType: dataType
-        });
-
-
-    }
-
-    function GetRenderIteration(iteration) {
-        var query = {
-            "renderIteration": iteration
-        };
-
-        var send_data = {
-            "query_string": JSON.stringify(query)
-        };
-
-        $.ajax({
-            type: "GET"
-                //type: "POST"
-                //crossDomain : true,
-                //cache: false,
-                //url: database_URI + '/getFromCollection/Cameras',
-                ,
-            url: database_URI + '/getFromCollection/ImageIterations'
-                //data: data,
-                ,
-            success: function (data, textStatus, jqXHR) {
-                //console.log(textStatus);
-                //console.log(data);
-                UpdateRenderCanvas(data[0]);
-            },
-            error: function (jqXHR, textStatus, errorThrown) {
-                console.log(textStatus);
-                console.log(jqXHR);
-                console.log(errorThrown);
-            }
-
-            // The query.
-            //, data: query
-
-            ,
-            data: send_data
-
-            //, dataType: "json"
-            //dataType: dataType
-        });
-    }
 
     /**
      * Creates instances for image analyzer and every chart;
      * the classes are defined in the respective javascript files.
      */
     function init() {
-
-        //GetRenderIteration(2);
-
-
-
         //Creating instances for each visualization
         var pathsChart = new PathsChart();
         var samplesChart = new SamplesChart(pathsChart);
 
-        console.log('Requested the GALLERY json.')
-            // Get the render gallery and load the image analyzer
+        $(function () {
+            $('[data-toggle="popover"]')
+                .popover({
+                    'placement': 'auto top',
+                    'trigger': 'hover'
+                })
+                .on('inserted.bs.popover', function (e) {
+
+                })
+        });
+
+
+        // Get the render gallery and load the image analyzer
         if (demo) {
             d3.json("data/renders.json", function (error, renders) {
                 var imageAnalyzer = new ImageAnalyzer(samplesChart, pathsChart, renders);
                 imageAnalyzer.update();
             });
-        } else {
-            d3.json("data/renders.json", function (error, renders) {
+        }
+        else {
+            d3.json(server + rendersQuery + 'renders.json', function (error, renders) {
                 var imageAnalyzer = new ImageAnalyzer(samplesChart, pathsChart, renders);
                 imageAnalyzer.update();
             });
         }
 
+        $('#send-to-server').on('click', function () {
+            if (userModifications == userModificationsDefault)
+                Confirm.show('No Adjustments Made', 'You have no made any modifications to be sent to server.');
+            else if (serverSend == "")
+                Confirm.show('Server Not Found', 'Unfortunately we were unable to find a valid server to send you changes to!');
+            else {
+                // Send info to server
+            }
+        });
     }
 
     /**
@@ -217,3 +189,10 @@ var removedSamples = {};
 
     Main.getInstance();
 })();
+
+$(document).ready(function() {
+    $('pre code').each(function(i, block) {
+        hljs.highlightBlock(block);
+    });
+});
+
