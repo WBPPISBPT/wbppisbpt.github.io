@@ -35,7 +35,7 @@ This visualization project provides a wide range of image and data inspection. F
 Each tool has self-explanatory description, and to reduce confusion every element is document as much as possible to guide the user through the data, and process.
 
 ### URLS
-* [Screen Cast URL]
+* [Screen Cast URL] (https://youtu.be/rxdyn2yHP1s)
 * [Website URL] (https://wbppisbpt.github.io/)
 
 ### Background and Motivation 
