@@ -3,7 +3,12 @@
 #### Concept by Laura Lediaev 
 
 ### Introduction 
-This application is a web base tool that allows the users to explore the different hierarchies of data that combine to form an image (render) using Path Tracing techniques. The user can further identify problematic sample, path lengths, or objects and remove them or alter them to fit their need by sending representative of problematic data to the server which in turn will process the statistical data and return a new render. Furthermore the user is able to detect and fix problematic pixels with a high-level approach using automatic "firefly" detection and removal tools. ### Tools The following tools and technologies have been used extensively throughout this project: 
+This application is a web base tool that allows the users to explore the different hierarchies of data that combine to form an image (render) using Path Tracing techniques. The user can further identify problematic sample, path lengths, or objects and remove them or alter them to fit their need by sending representative of problematic data to the server which in turn will process the statistical data and return a new render. Furthermore the user is able to detect and fix problematic pixels with a high-level approach using automatic "firefly" detection and removal tools. 
+
+![](https://graphics.stanford.edu/data/3Dscanrep/stanford-bunny-cebal-ssh.jpg) 
+
+### Tools 
+The following tools and technologies have been used extensively throughout this project: 
 * [D3.js](https://d3js.org/) 
 	* D3 is used to construct and manipulate the different windows, and dynamically display relevant information.
 * [jQuery](https://jquery.com/) 
