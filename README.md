@@ -1,12 +1,3 @@
-# vis2016
-Web based post-processing image statistics for bidirectional path tracing.
-
-Introduction :
-
-This application is a web base tool that allows the user to visualize the different samples that
-make up an image that was produced using path tracing. This allows the user to identify problematic
-sample and remove them or alter them to fit their need.
-
 ## Tools
 In order to produce this tool we used vaious libraries:
 
@@ -36,19 +27,17 @@ Our tool has is numerous feature that can be used to process the images.
 We have incule a brief description of the different tools under each window
 that user can use as guide for non intuitive features.
 
-
-## URLS
-[Screen Cast URL]
-
-
-[Website URL] (https://wbppisbpt.github.io/)
-
 ## Web Based Post-Processing Image Statistics for Bidirectional Path Tracing 
 #### Developed by Hirad Sabaghian & Timbwaoga Aime Judicael Ouermi 
 #### Concept by Laura Lediaev 
 
 ### Introduction 
-This application is a web base tool that allows the users to explore the different hierarchies of data that combine to form an image (render) using Path Tracing techniques. The user can further identify problematic sample, path lengths, or objects and remove them or alter them to fit their need by sending representative of problematic data to the server which in turn will process the statistical data and return a new render. Furthermore the user is able to detect and fix problematic pixels with a high-level approach using automatic "firefly" detection and removal tools. ### Tools The following tools and technologies have been used extensively throughout this project: * [D3.js](https://d3js.org/) * [jQuery](https://jquery.com/) * [HTML5 Canvas Element](https://developer.mozilla.org/en-US/docs/Web/API/Canvas_API) * [Cropper.js](https://github.com/fengyuanchen/cropper) * [Bootstrap](http://getbootstrap.com/) 
+This application is a web base tool that allows the users to explore the different hierarchies of data that combine to form an image (render) using Path Tracing techniques. The user can further identify problematic sample, path lengths, or objects and remove them or alter them to fit their need by sending representative of problematic data to the server which in turn will process the statistical data and return a new render. Furthermore the user is able to detect and fix problematic pixels with a high-level approach using automatic "firefly" detection and removal tools. ### Tools The following tools and technologies have been used extensively throughout this project: 
+* [D3.js](https://d3js.org/) 
+* [jQuery](https://jquery.com/) 
+* [HTML5 Canvas Element](https://developer.mozilla.org/en-US/docs/Web/API/Canvas_API) 
+* [Cropper.js](https://github.com/fengyuanchen/cropper) 
+* [Bootstrap](http://getbootstrap.com/) 
 
 ### Background and Motivation 
 Bidirectional path tracing is a physically-based rendering technique. In many cases it is capable of producing a rendered image that is practically indistinguishable from a photograph. The rendering program attempts to simulate the physical properties of all elements of a scene, including lights, geometric objects, materials, and cameras. Path tracing is a Monte-Carlo integration technique that generates paths using probability distributions. Regular (unidirectional) path tracing starts by choosing a random position on the film plane and then randomly choosing a position on the camera aperture. These two choices will create a ray that shoots from the camera into the scene. Every time the ray intersects a surface, the material properties of the surface are used to choose a new direction to travel in. The ray continues to bounce around the scene until one of three conditions is met. The ray may hit a light creating a complete path, at which point the ray’s path is terminated. Alternatively, the ray may have bounced so many times that we choose to terminate it. Lastly, the scene might be open and the ray may have gone off into outer space (a non-hit). Every surface interaction, including the camera, is called a vertex. A complete path starts at the camera and ends at a light, and every vertex contains information needed to calculate the final color contribution for that path. ![](http://graphics.stanford.edu/~henrik/images/imgs/cbox_pathtracing.jpg) 
@@ -63,7 +52,7 @@ The actual data is generated as a matter of course during the rendering process.
 Data is broken up into a hierarchy of four levels. At the root we the actual image which contains a series of pixels, each containing four values for Red, Blue, Green, and Alpha channels. This information is simply inferred from the received image. Next, for each pixel, there exists a collection of sample that contribute to the final color value of the pixel. We use the following scheme for representing sample collections.
 
 <pre>                        
-`{"samples": [
+{"samples": [
 	{"uid": "S-X-Y-0", "final_contribution": 0.00000, "red": 0.00000, "green": 0.00000, "blue": 0.00000},
 	{"uid": "S-X-Y-1", "final_contribution": 0.00000, "red": 0.00000, "green": 0.00000, "blue": 0.00000},
 	{"uid": "S-X-Y-2", "final_contribution": 0.00000, "red": 0.00000, "green": 0.00000, "blue": 0.00000},
@@ -71,13 +60,13 @@ Data is broken up into a hierarchy of four levels. At the root we the actual ima
 	{"uid": "S-X-Y-4", "final_contribution": 0.00000, "red": 0.00000, "green": 0.00000, "blue": 0.00000},
 	{"uid": "S-X-Y-5", "final_contribution": 0.00000, "red": 0.00000, "green": 0.00000, "blue": 0.00000},
 	{"uid": "S-X-Y-6", "final_contribution": 0.00000, "red": 0.00000, "green": 0.00000, "blue": 0.00000},
-]}` 
+]}
 </pre>
 
 The <kbd>S-X-Y-N</kbd> ID of each sample represents the pixel it belongs to using the <kbd>X</kbd> and <kbd>Y</kbd> values which respectively correspond to the row and column of the pixel in the image. The last integer <kbd>N</kbd> is the unique index of the sample for that pixel. <kbd>S</kbd> is simply a prefix that identifies this object as a <kbd>Sample</kbd>. Each sample consists of a unique ID which was explained above, as well as a <kbd>final_contribution</kbd> value which signifies the importance of the sample in the context of the parent pixel, as well as <kbd>RGB</kbd> values. A sample is in turn a product of a number of paths. And yet each path itself is formed from a ray bouncing from different objects. We represents the paths and vertices collections as follows.
 
 <pre>                        
-`{"paths": [
+{"paths": [
 	{"uid": "P-X-Y-S-0", "weight": 0.25, "red": 0, "green": 0, "blue": 0,
 		"veredtices": [
 			{"oblueject_id": 3, "red": 0.00000, "green": 0.00000, "blue": 0.00000},
@@ -101,7 +90,7 @@ The <kbd>S-X-Y-N</kbd> ID of each sample represents the pixel it belongs to usin
 			{"oblueject_id": 5, "red": 0.00000, "green": 0.00000, "blue": 0.00000}
 		]
 	}
-]}` 
+]} 
 </pre>
 
 Similarly <kbd>P-X-Y-S-N</kbd> ID of each path represents its unique index <kbd>N</kbd> in the sample <kbd>S</kbd> that it belongs to, as well as the pixel the sample belongs to using the <kbd>X</kbd> and <kbd>Y</kbd> values which respectively correspond to the row and column of the pixel in the image. <kbd>P</kbd> is simply a prefix that identifies this object as a <kbd>Path</kbd>. As displayed, a path in our representation consists a number of vertices, each having their own value of <kbd>RGB</kbd>. The path itself also is represented using <kbd>RGB</kbd> and in this case a uniform <kbd>weight</kbd>.
