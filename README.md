@@ -62,7 +62,8 @@ The actual data is generated as a matter of course during the rendering process.
 ### Data Representation
 Data is broken up into a hierarchy of four levels. At the root we the actual image which contains a series of pixels, each containing four values for Red, Blue, Green, and Alpha channels. This information is simply inferred from the received image. Next, for each pixel, there exists a collection of sample that contribute to the final color value of the pixel. We use the following scheme for representing sample collections.
 
-<pre>                        `{"samples": [
+<pre>                        
+`{"samples": [
 	{"uid": "S-X-Y-0", "final_contribution": 0.00000, "red": 0.00000, "green": 0.00000, "blue": 0.00000},
 	{"uid": "S-X-Y-1", "final_contribution": 0.00000, "red": 0.00000, "green": 0.00000, "blue": 0.00000},
 	{"uid": "S-X-Y-2", "final_contribution": 0.00000, "red": 0.00000, "green": 0.00000, "blue": 0.00000},
@@ -71,11 +72,12 @@ Data is broken up into a hierarchy of four levels. At the root we the actual ima
 	{"uid": "S-X-Y-5", "final_contribution": 0.00000, "red": 0.00000, "green": 0.00000, "blue": 0.00000},
 	{"uid": "S-X-Y-6", "final_contribution": 0.00000, "red": 0.00000, "green": 0.00000, "blue": 0.00000},
 ]}` 
-                    </pre>
+</pre>
 
 The <kbd>S-X-Y-N</kbd> ID of each sample represents the pixel it belongs to using the <kbd>X</kbd> and <kbd>Y</kbd> values which respectively correspond to the row and column of the pixel in the image. The last integer <kbd>N</kbd> is the unique index of the sample for that pixel. <kbd>S</kbd> is simply a prefix that identifies this object as a <kbd>Sample</kbd>. Each sample consists of a unique ID which was explained above, as well as a <kbd>final_contribution</kbd> value which signifies the importance of the sample in the context of the parent pixel, as well as <kbd>RGB</kbd> values. A sample is in turn a product of a number of paths. And yet each path itself is formed from a ray bouncing from different objects. We represents the paths and vertices collections as follows.
 
-<pre>                        `{"paths": [
+<pre>                        
+`{"paths": [
 	{"uid": "P-X-Y-S-0", "weight": 0.25, "red": 0, "green": 0, "blue": 0,
 		"veredtices": [
 			{"oblueject_id": 3, "red": 0.00000, "green": 0.00000, "blue": 0.00000},
@@ -100,6 +102,6 @@ The <kbd>S-X-Y-N</kbd> ID of each sample represents the pixel it belongs to usin
 		]
 	}
 ]}` 
-                    </pre>
+</pre>
 
 Similarly <kbd>P-X-Y-S-N</kbd> ID of each path represents its unique index <kbd>N</kbd> in the sample <kbd>S</kbd> that it belongs to, as well as the pixel the sample belongs to using the <kbd>X</kbd> and <kbd>Y</kbd> values which respectively correspond to the row and column of the pixel in the image. <kbd>P</kbd> is simply a prefix that identifies this object as a <kbd>Path</kbd>. As displayed, a path in our representation consists a number of vertices, each having their own value of <kbd>RGB</kbd>. The path itself also is represented using <kbd>RGB</kbd> and in this case a uniform <kbd>weight</kbd>.
