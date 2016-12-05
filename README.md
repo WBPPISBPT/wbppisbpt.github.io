@@ -34,6 +34,7 @@ that user can use as guide for non intuitive features.
 ### Introduction 
 This application is a web base tool that allows the users to explore the different hierarchies of data that combine to form an image (render) using Path Tracing techniques. The user can further identify problematic sample, path lengths, or objects and remove them or alter them to fit their need by sending representative of problematic data to the server which in turn will process the statistical data and return a new render. Furthermore the user is able to detect and fix problematic pixels with a high-level approach using automatic "firefly" detection and removal tools. ### Tools The following tools and technologies have been used extensively throughout this project: 
 * [D3.js](https://d3js.org/) 
+** Test
 * [jQuery](https://jquery.com/) 
 * [HTML5 Canvas Element](https://developer.mozilla.org/en-US/docs/Web/API/Canvas_API) 
 * [Cropper.js](https://github.com/fengyuanchen/cropper) 
