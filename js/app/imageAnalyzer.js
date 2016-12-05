@@ -587,7 +587,7 @@ ImageAnalyzer.prototype.cleanseDetectionBtnDiscard = function (cmd) {
                     scrollTop: $("#render-region").offset().top
                 }, 200);
 
-                if (cmd = 'user-pp') {
+                if (cmd = 'user-pp' && !s.isServer) {
                     cleanseDetectionButton.text('Auto Cleanse');
                     s.refreshData();
                     setPopover(cleanseDetectionButton, popOptCleanse);
@@ -722,6 +722,7 @@ ImageAnalyzer.prototype.manualDetectFireflies = function () {
     $('#indicator-outer').click(function (event) {
         s.getFirefly(event, s);
         if (!s.isServer) {
+            $('.download-reset').fadeIn(350, 'linear');
             s.updateReconstCanvasCropper();
         }
     });

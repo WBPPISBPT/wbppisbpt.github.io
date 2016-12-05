@@ -1,6 +1,6 @@
 {
 	"renders": [
-		{"uid": "R0", "type": "manual", "thumbnailURI": "data/images/image5.jpg", "sourceURI": "data/images/image5.jpg", "width": 1280, "height": 720, "samples" : 500},
-		{"uid": "R1", "type": "server", "thumbnailURI": "data/images/image.png", "sourceURI": "data/images/image.png", "width": 200, "height": 90, "samples" : 4}
+		{"uid": "R1", "type": "server", "thumbnailURI": "data/images/image.png", "sourceURI": "data/images/image.png", "width": 200, "height": 90, "samples" : 4},
+		{"uid": "R0", "type": "manual", "thumbnailURI": "data/images/image5.jpg", "sourceURI": "data/images/image5.jpg", "width": 1280, "height": 720, "samples" : 500}
 	]
 }

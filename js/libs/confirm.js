@@ -150,7 +150,7 @@ var Confirm = {
         });
 
         $('.modal-dialog').css('margin-top', function () {
-            return 'calc(50% - ' + test + 'px)';
+            return ((window.innerHeight/2) - (test/2)) + 'px';
         });
 
 
