@@ -6,4 +6,6 @@ website/.idea/
 .idea/
 data/paths-json
 data/samples-json
+data/paths
+data/samples
 data/data

@@ -9,13 +9,15 @@
     <script src="main.js" charset="utf-8" type="text/javascript" defer></script> -->
 
     <link href="https://fonts.googleapis.com/css?family=Montserrat:400,700|Open+Sans:300,400,600" rel="stylesheet">
-    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.8.0/styles/default.min.css">
+    <!--<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.8.0/styles/default.min.css">-->
     <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.8.0/highlight.min.js" defer></script>
+    <!--<script src="https://cdn.rawgit.com/google/code-prettify/master/loader/run_prettify.js"></script>-->
 
     <link rel="stylesheet" href="css/bootstrap.min.css">
     <link rel="stylesheet" href="css/main.css">
     <link rel="stylesheet" href="css/cropper.min.css">
     <link rel="stylesheet" href="css/tooltip-popover.css">
+    <link rel="stylesheet" href="css/tomorrow-night-bright.css">
 
     <script src="js/libs/d3.v4.min.js" defer></script>
     <script src="js/libs/d3-legend.js" defer></script>
@@ -25,7 +27,6 @@
     <script src="js/libs/bootstrap.min.js" defer></script>
     <script src="js/libs/cropper.min.js" defer></script>
     <script src="js/libs/confirm.js" defer></script>
-    <script src="js/libs/hamsters.js" defer></script>
 
     <script src="js/app/imageAnalyzer.js" defer></script>
     <script src="js/app/samplesChart.js" defer></script>
@@ -36,54 +37,178 @@
 
 <body id="top">
 <div class="about">
-    <img src="https://maxcdn.icons8.com/windows8/PNG/48/User_Interface/close_window-48.png" class="close-img" title="Close About Page" width="48"
+    <img src="https://maxcdn.icons8.com/windows8/PNG/48/User_Interface/close_window-48.png" class="close-img"
+         title="Close About Page" width="48"
          data-toggle="popover" data-trigger="hover"
          data-content="You can open it again by clicking on the About link.">
     <div class="container">
         <div class="row about-outter">
             <div class="col-md-12 about-inner">
                 <p>
-                    Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.
+                <h2 class="text-center">Web Based Post-Processing Image Statistics for Bidirectional Path Tracing</h2>
+                <h4 class="text-center">Developed by Hirad Sabaghian & Timbwaoga Aime Judicael Ouermi</h4>
+                <h4 class="text-center">Conceppt by Laura Lediaev</h4>
+                <div style="margin-top: 50px;">
+                    <h3>Introduction </h3>
+                    <p> This application is a web base tool that allows the users to explore the different hierarchies of data that combine to form an image (render) using Path Tracing techniques. The user can further identify problematic sample, path lengths, or objects and remove them or alter them to fit their need by sending representative of problematic data to the server which in turn will process the statistical data and return a new render.
+                    </p>
+                    <p>
+                        Furthermore the user is able to detect and fix problematic pixels with a high-level approach using automatic "firefly" detection and removal tools.
+                    </p>
+                </div>
+                <div style="margin-top: 50px;">
+                    <h3>Tools </h3>
+                    <p> The following tools and technologies have been used extensively throughout this project:
+                    </p>
+                    <ul>
+                        <li><a href="https://d3js.org/" target="_blank">D3.js</a></li>
+                        <li><a href="https://jquery.com/" target="_blank">jQuery</a></li>
+                        <li><a href="https://developer.mozilla.org/en-US/docs/Web/API/Canvas_API" target="_blank">HTML5 Canvas Element</a></li>
+                        <li><a href="https://github.com/fengyuanchen/cropper" target="_blank">Cropper.js</a></li>
+                        <li><a href="http://getbootstrap.com/" target="_blank">Bootstrap</a></li>
+                    </ul>
+                </div>
+                <div style="margin-top: 50px;">
+                    <h3>Background and Motivation</h3>
+                    <p> Bidirectional path tracing is a physically-based rendering technique. In many cases it is
+                        capable of producing a rendered image that is practically indistinguishable from a photograph.
+                        The rendering program attempts to simulate the physical properties of all elements of a scene,
+                        including lights, geometric objects, materials, and cameras. Path tracing is a Monte-Carlo
+                        integration technique that generates paths using probability distributions.
+                    </p>
+                    <p>
+                        Regular (unidirectional) path tracing starts by choosing a random position on the film plane and
+                        then randomly choosing a position on the camera aperture. These two choices will create a ray
+                        that shoots from the camera into the scene. Every time the ray intersects a surface, the
+                        material properties of the surface are used to choose a new direction to travel in. The ray
+                        continues to bounce around the scene until one of three conditions is met. The ray may hit a
+                        light creating a complete path, at which point the ray’s path is terminated. Alternatively, the
+                        ray may have bounced so many times that we choose to terminate it. Lastly, the scene might be
+                        open and the ray may have gone off into outer space (a non-hit). Every surface interaction,
+                        including the camera, is called a vertex. A complete path starts at the camera and ends at a
+                        light, and every vertex contains information needed to calculate the final color contribution
+                        for that path.
+                    </p>
+                    <p class="text-center">
+                        <img
+                                src="http://graphics.stanford.edu/~henrik/images/imgs/cbox_pathtracing.jpg">
+                    </p>
+                </div>
+                <div style="margin-top: 50px;">
+                    <h3>Project Objectives</h3>
+                    <p> The main purpose of this visualization project is to provide an overview of the rendering
+                        process and make it easy to explore how the image was created and possibly identify problematic
+                        pixel samples. This allows the artist/developer to understand and determine the components of
+                        the scene that result in low-probability paths that can lead to noise in the final image. Such
+                        low-probability paths can result in outlier pixels, informally referred to as fireflies, that do
+                        not fit in terms of color with their neighboring pixels due to intense brightness. Through
+                        visualizing path statistics and probabilities, one could easily trace the source of the error
+                        and proceed with modifying the image to eliminate the outlier pixel samples, or conversely
+                        changing the scene to make rendering easier.
+                    </p>
+                    <p>
+                        There is one question that is very important to answer, which samples cause a pixel to be a
+                        great deal brighter than it should be. These <strong>outlier pixels or “fireflies”</strong> are
+                        a common nuisance in rendering, and
+                        can come from many difference sources. These bad samples are not incorrect, strictly speaking,
+                        but would require a very high number of samples in order to average to the expected (correct)
+                        color value. That is because these are usually very low probability samples. We possibly need an
+                        unreasonably large number of samples to get a substantial set of these rare samples. In order to
+                        produce a nice image in a reasonable amount of time, it is often more pragmatic to simply remove
+                        these samples from the image.
+                    </p>
 
-                    Why do we use it?
-                    It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here', making it look like readable English. Many desktop publishing packages and web page editors now use Lorem Ipsum as their default model text, and a search for 'lorem ipsum' will uncover many web sites still in their infancy. Various versions have evolved over the years, sometimes by accident, sometimes on purpose (injected humour and the like).
+                    <p class="text-center">
+                        <img
+                                src="https://4.bp.blogspot.com/-dOR9w1pz7OU/VvjAk-l4OgI/AAAAAAAAA-k/bXjuYDtFYAIEaWuPLLy_taIPrai5i6vMw/s1600/25v36.png">
+                    </p>
+                </div>
+                <div style="margin-top: 50px;">
+                    <h3>Data</h3>
+                    <p> The actual data is generated as a matter of course during the rendering process. Normally this
+                        data is generated iteratively, processed to get a final color value, and then discarded in order
+                        to minimize memory usage.
+                        <strike data-toggle="popover" data-trigger="hover" title="Databse was never created"
+                                data-content="Unfortunately the person responsible was unable to implement the database in a timely manner.">
+                            Since there will be a large amount of data, I have decided to store
+                            everything in a database. The database may need to be optimized for queries, since fetching
+                            data
+                            may cause a bottleneck.
+                        </strike> Our rendering program is <a href="http://www.kevinbeason.com/smallpt/">smallpt</a>,
+                        written in C++ by Kevin Beason. It features Global illumination via unbiased Monte Carlo path
+                        tracing and Specular, Diffuse, and Glass BRDFs. The data was stored as a series of JSON files
+                        for each pixel and samples.
+                    </p>
+                </div>
 
-
-                    Where does it come from?
-                    Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots in a piece of classical Latin literature from 45 BC, making it over 2000 years old. Richard McClintock, a Latin professor at Hampden-Sydney College in Virginia, looked up one of the more obscure Latin words, consectetur, from a Lorem Ipsum passage, and going through the cites of the word in classical literature, discovered the undoubtable source. Lorem Ipsum comes from sections 1.10.32 and 1.10.33 of "de Finibus Bonorum et Malorum" (The Extremes of Good and Evil) by Cicero, written in 45 BC. This book is a treatise on the theory of ethics, very popular during the Renaissance. The first line of Lorem Ipsum, "Lorem ipsum dolor sit amet..", comes from a line in section 1.10.32.
-
-                    The standard chunk of Lorem Ipsum used since the 1500s is reproduced below for those interested. Sections 1.10.32 and 1.10.33 from "de Finibus Bonorum et Malorum" by Cicero are also reproduced in their exact original form, accompanied by English versions from the 1914 translation by H. Rackham.
-                    Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.
-
-                    Why do we use it?
-                    It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here', making it look like readable English. Many desktop publishing packages and web page editors now use Lorem Ipsum as their default model text, and a search for 'lorem ipsum' will uncover many web sites still in their infancy. Various versions have evolved over the years, sometimes by accident, sometimes on purpose (injected humour and the like).
-
-
-                    Where does it come from?
-                    Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots in a piece of classical Latin literature from 45 BC, making it over 2000 years old. Richard McClintock, a Latin professor at Hampden-Sydney College in Virginia, looked up one of the more obscure Latin words, consectetur, from a Lorem Ipsum passage, and going through the cites of the word in classical literature, discovered the undoubtable source. Lorem Ipsum comes from sections 1.10.32 and 1.10.33 of "de Finibus Bonorum et Malorum" (The Extremes of Good and Evil) by Cicero, written in 45 BC. This book is a treatise on the theory of ethics, very popular during the Renaissance. The first line of Lorem Ipsum, "Lorem ipsum dolor sit amet..", comes from a line in section 1.10.32.
-
-                    The standard chunk of Lorem Ipsum used since the 1500s is reproduced below for those interested. Sections 1.10.32 and 1.10.33 from "de Finibus Bonorum et Malorum" by Cicero are also reproduced in their exact original form, accompanied by English versions from the 1914 translation by H. Rackham.
-                    Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.
-
-                    Why do we use it?
-                    It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here', making it look like readable English. Many desktop publishing packages and web page editors now use Lorem Ipsum as their default model text, and a search for 'lorem ipsum' will uncover many web sites still in their infancy. Various versions have evolved over the years, sometimes by accident, sometimes on purpose (injected humour and the like).
-
-
-                    Where does it come from?
-                    Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots in a piece of classical Latin literature from 45 BC, making it over 2000 years old. Richard McClintock, a Latin professor at Hampden-Sydney College in Virginia, looked up one of the more obscure Latin words, consectetur, from a Lorem Ipsum passage, and going through the cites of the word in classical literature, discovered the undoubtable source. Lorem Ipsum comes from sections 1.10.32 and 1.10.33 of "de Finibus Bonorum et Malorum" (The Extremes of Good and Evil) by Cicero, written in 45 BC. This book is a treatise on the theory of ethics, very popular during the Renaissance. The first line of Lorem Ipsum, "Lorem ipsum dolor sit amet..", comes from a line in section 1.10.32.
-
-                    The standard chunk of Lorem Ipsum used since the 1500s is reproduced below for those interested. Sections 1.10.32 and 1.10.33 from "de Finibus Bonorum et Malorum" by Cicero are also reproduced in their exact original form, accompanied by English versions from the 1914 translation by H. Rackham.
-                    Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.
-
-                    Why do we use it?
-                    It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here', making it look like readable English. Many desktop publishing packages and web page editors now use Lorem Ipsum as their default model text, and a search for 'lorem ipsum' will uncover many web sites still in their infancy. Various versions have evolved over the years, sometimes by accident, sometimes on purpose (injected humour and the like).
-
-
-                    Where does it come from?
-                    Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots in a piece of classical Latin literature from 45 BC, making it over 2000 years old. Richard McClintock, a Latin professor at Hampden-Sydney College in Virginia, looked up one of the more obscure Latin words, consectetur, from a Lorem Ipsum passage, and going through the cites of the word in classical literature, discovered the undoubtable source. Lorem Ipsum comes from sections 1.10.32 and 1.10.33 of "de Finibus Bonorum et Malorum" (The Extremes of Good and Evil) by Cicero, written in 45 BC. This book is a treatise on the theory of ethics, very popular during the Renaissance. The first line of Lorem Ipsum, "Lorem ipsum dolor sit amet..", comes from a line in section 1.10.32.
-
-                    The standard chunk of Lorem Ipsum used since the 1500s is reproduced below for those interested. Sections 1.10.32 and 1.10.33 from "de Finibus Bonorum et Malorum" by Cicero are also reproduced in their exact original form, accompanied by English versions from the 1914 translation by H. Rackham.
-                </p>
+                <div style="margin-top: 50px;">
+                    <h3>Data Representation</h3>
+                    <p>
+                        Data is broken up into a hierarchy of four levels. At the root we the actual image which
+                        contains a series of pixels, each containing four values for Red, Blue, Green, and Alpha
+                        channels. This information is simply inferred from the received image.
+                    </p>
+                    <p>
+                        Next, for each pixel, there exists a collection of sample that contribute to the final color
+                        value of the pixel. We use the following scheme for representing sample collections.
+                    </p>
+                    <pre>
+                        <code class="json">
+{&quot;samples&quot;: [
+	{&quot;uid&quot;: &quot;S-X-Y-0&quot;, &quot;final_contribution&quot;: 0.00000, &quot;red&quot;: 0.00000, &quot;green&quot;: 0.00000, &quot;blue&quot;: 0.00000},
+	{&quot;uid&quot;: &quot;S-X-Y-1&quot;, &quot;final_contribution&quot;: 0.00000, &quot;red&quot;: 0.00000, &quot;green&quot;: 0.00000, &quot;blue&quot;: 0.00000},
+	{&quot;uid&quot;: &quot;S-X-Y-2&quot;, &quot;final_contribution&quot;: 0.00000, &quot;red&quot;: 0.00000, &quot;green&quot;: 0.00000, &quot;blue&quot;: 0.00000},
+	{&quot;uid&quot;: &quot;S-X-Y-3&quot;, &quot;final_contribution&quot;: 0.00000, &quot;red&quot;: 0.00000, &quot;green&quot;: 0.00000, &quot;blue&quot;: 0.00000},
+	{&quot;uid&quot;: &quot;S-X-Y-4&quot;, &quot;final_contribution&quot;: 0.00000, &quot;red&quot;: 0.00000, &quot;green&quot;: 0.00000, &quot;blue&quot;: 0.00000},
+	{&quot;uid&quot;: &quot;S-X-Y-5&quot;, &quot;final_contribution&quot;: 0.00000, &quot;red&quot;: 0.00000, &quot;green&quot;: 0.00000, &quot;blue&quot;: 0.00000},
+	{&quot;uid&quot;: &quot;S-X-Y-6&quot;, &quot;final_contribution&quot;: 0.00000, &quot;red&quot;: 0.00000, &quot;green&quot;: 0.00000, &quot;blue&quot;: 0.00000},
+]}
+                    </code>
+                    </pre>
+                    <p>
+                        The <kbd>S-X-Y-N</kbd> ID of each sample represents the pixel it belongs to using the <kbd>X</kbd> and <kbd>Y</kbd> values which respectively correspond to the row and column of the pixel in the image. The last integer <kbd>N</kbd> is the unique index of the sample for that pixel. <kbd>S</kbd> is simply a prefix that identifies this object as a <kbd>Sample</kbd>.
+                    </p>
+                    <p>
+                        Each sample consists of a unique ID which was explained above, as well as a <kbd>final_contribution</kbd> value which signifies the importance of the sample in the context of the parent pixel, as well as <kbd>RGB</kbd> values. A sample is in turn a product of a number of paths. And yet each path itself is formed from
+                        a ray bouncing from different objects. We represents the paths and vertices collections as
+                        follows.
+                    </p>
+                    <pre>
+                        <code class="json">
+{&quot;paths&quot;: [
+	{&quot;uid&quot;: &quot;P-X-Y-S-0&quot;, &quot;weight&quot;: 0.25, &quot;red&quot;: 0, &quot;green&quot;: 0, &quot;blue&quot;: 0,
+		&quot;veredtices&quot;: [
+			{&quot;oblueject_id&quot;: 3, &quot;red&quot;: 0.00000, &quot;green&quot;: 0.00000, &quot;blue&quot;: 0.00000},
+			{&quot;oblueject_id&quot;: 5, &quot;red&quot;: 0.00000, &quot;green&quot;: 0.00000, &quot;blue&quot;: 0.00000},
+			{&quot;oblueject_id&quot;: 3, &quot;red&quot;: 0.00000, &quot;green&quot;: 0.00000, &quot;blue&quot;: 0.00000},
+			{&quot;oblueject_id&quot;: 5, &quot;red&quot;: 0.00000, &quot;green&quot;: 0.00000, &quot;blue&quot;: 0.00000},
+			{&quot;oblueject_id&quot;: 4, &quot;red&quot;: 0.00000, &quot;green&quot;: 0.00000, &quot;blue&quot;: 0.00000},
+			{&quot;oblueject_id&quot;: 0, &quot;red&quot;: 0.00000, &quot;green&quot;: 0.00000, &quot;blue&quot;: 0.00000},
+			{&quot;oblueject_id&quot;: 4, &quot;red&quot;: 0.00000, &quot;green&quot;: 0.00000, &quot;blue&quot;: 0.00000}
+		]
+	},
+	{&quot;uid&quot;: &quot;P-X-Y-S-1&quot;, &quot;weight&quot;: 0.25, &quot;red&quot;: 0, &quot;green&quot;: 0, &quot;blue&quot;: 0,
+		&quot;veredtices&quot;: [
+			{&quot;oblueject_id&quot;: 3, &quot;red&quot;: 0.00000, &quot;green&quot;: 0.00000, &quot;blue&quot;: 0.00000},
+			{&quot;oblueject_id&quot;: 0, &quot;red&quot;: 0.00000, &quot;green&quot;: 0.00000, &quot;blue&quot;: 0.00000},
+			{&quot;oblueject_id&quot;: 3, &quot;red&quot;: 0.00000, &quot;green&quot;: 0.00000, &quot;blue&quot;: 0.00000},
+			{&quot;oblueject_id&quot;: 0, &quot;red&quot;: 0.00000, &quot;green&quot;: 0.00000, &quot;blue&quot;: 0.00000},
+			{&quot;oblueject_id&quot;: 4, &quot;red&quot;: 0.00000, &quot;green&quot;: 0.00000, &quot;blue&quot;: 0.00000},
+			{&quot;oblueject_id&quot;: 5, &quot;red&quot;: 0.00000, &quot;green&quot;: 0.00000, &quot;blue&quot;: 0.00000},
+			{&quot;oblueject_id&quot;: 4, &quot;red&quot;: 0.00000, &quot;green&quot;: 0.00000, &quot;blue&quot;: 0.00000},
+			{&quot;oblueject_id&quot;: 5, &quot;red&quot;: 0.00000, &quot;green&quot;: 0.00000, &quot;blue&quot;: 0.00000}
+		]
+	}
+]}
+                    </code>
+                    </pre>
+                    <p>
+                        Similarly <kbd>P-X-Y-S-N</kbd> ID of each path represents its unique index <kbd>N</kbd> in the sample <kbd>S</kbd> that it belongs to, as well as the pixel the sample belongs to using the <kbd>X</kbd> and <kbd>Y</kbd> values which respectively correspond to the row and column of the pixel in the image. <kbd>P</kbd> is simply a prefix that identifies this object as a <kbd>Path</kbd>.
+                    </p>
+                    <p>
+                        As displayed, a path in our representation consists a number of vertices, each having their own value of <kbd>RGB</kbd>. The path itself also is represented using <kbd>RGB</kbd> and in this case a uniform <kbd>weight</kbd>.
+                    </p>
+                </div>
             </div>
         </div>
     </div>

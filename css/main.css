@@ -83,6 +83,15 @@ a.navbar-brand {
     padding: 0;
 }
 
+h1, h2, h3, h4, h5 {
+    font-family: Montserrat;
+}
+
+pre {
+    background: transparent;
+    border: none;
+}
+
 .animate {
     transition: all 0.2s ease;
 }
