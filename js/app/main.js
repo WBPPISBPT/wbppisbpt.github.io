@@ -75,6 +75,10 @@ $('.close-img').on('click', function () {
    $('.about').fadeOut(350, 'linear');
 });
 
+$('.about').on('click', function () {
+   $('.about').fadeOut(350, 'linear');
+});
+
 $('.open-about').on('click', function () {
     $('.about').fadeIn(350, 'linear');
 });
