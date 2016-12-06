@@ -133,28 +133,12 @@ pre {
     filter: invert(100%);
     border: none;
     border-radius: 50%;
-    background: #5a99d4;
     cursor: pointer;
     box-shadow: 0 0 0 0 rgba(#5a99d4, .5);
-    -webkit-animation: pulse 1.5s infinite;
 }
 
 .close-img:hover {
   -webkit-animation: none;
-}
-
-@-webkit-keyframes pulse {
-  0% {
-    @include transform(scale(.9));
-  }
-  70% {
-    @include transform(scale(1));
-    box-shadow: 0 0 0 50px rgba(#5a99d4, 0);
-  }
-    100% {
-    @include transform(scale(.9));
-    box-shadow: 0 0 0 0 rgba(#5a99d4, 0);
-  }
 }
 
 .hr-section {
