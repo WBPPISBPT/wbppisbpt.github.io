@@ -1,6 +1,7 @@
 ## Web Based Post-Processing Image Statistics for Bidirectional Path Tracing 
-#### Developed by Hirad Sabaghian & Timbwaoga Aime Judicael Ouermi 
-#### Concept by Laura Lediaev 
+#### Developed by Hirad Sabaghian
+#### Data & Documentation by Timbwaoga Aime Judicael Ouermi 
+#### Initial Concept by Laura Lediaev 
 
 ### Introduction 
 This application is a web base tool that allows the users to explore the different hierarchies of data that combine to form an image (render) using Path Tracing techniques. The user can further identify problematic sample, path lengths, or objects and remove them or alter them to fit their need by sending representative of problematic data to the server which in turn will process the statistical data and return a new render. Furthermore the user is able to detect and fix problematic pixels with a high-level approach using automatic "firefly" detection and removal tools. 
