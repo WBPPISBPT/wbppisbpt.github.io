@@ -75,7 +75,7 @@ $('.close-img').on('click', function () {
    $('.about').fadeOut(350, 'linear');
 });
 
-$('.about').on('click', function () {
+$('.about').on('dblclick', function () {
    $('.about').fadeOut(350, 'linear');
 });
 
