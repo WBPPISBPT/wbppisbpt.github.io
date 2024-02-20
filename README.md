@@ -1,5 +1,5 @@
 ## Web Based Post-Processing Image Statistics for Bidirectional Path Tracing 
-#### Developed by Hirad Sabaghian
+#### Developed by Hirad Sab
 #### Data & Documentation by Timbwaoga Aime Judicael Ouermi 
 #### Initial Concept by Laura Lediaev 
 
